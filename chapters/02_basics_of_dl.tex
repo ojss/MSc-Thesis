@@ -1,0 +1,12 @@
+\chapter{Basics of Deep Learning} \label{chap:basics-of-dl}
+
+Deep learning is an area of machine learning that uses Artificial Neural Networks \cite{mcculloch1943logical} and has been applied to a wide variety of tasks such as image classification, object recognition, activity recognition, 3D depth estimation and various natural language processing (NLP) tasks. In stark contrast to classical machine learning approach of designing manual feature extraction methods, deep learning focuses on making algorithms that can naturally learn to extract the relevant features.
+
+\section{Deep Feedforward Networks} \label{sec:feed-forward-nets}
+
+Deep feedforward networks, also called feedforward networks, or \textbf{multilayer perceptrons} (MLPs), are the essential deep learning models. The goal of a feedforward network is to approximate some ideal function \(f^\star\). 
+For example, a classifier \(y = f^\star(\symbfit{x})\) is a mapping between input $\symbfit{x}$ to a category $y$. A feedforward network has the capability to learn this mapping \(\symbfit{y} = f(\symbfit{x}; \symbfit{\theta})\) where $\symbfit{\theta}$ is a set of learned parameters that result in the best function approximation.
+
+Such models are called \textbf{feedforward} as the information flows through the function which evaluates $\symbfit{x}$ and outputs $\symbfit{y}$. The process of passing the input $\symbfit{x}$ through the function and through intermediate computations is known as the \textbf{forward pass}. We then use a \textbf{loss function} to measure the difference between $f^\star$ and $f$ - that is, the difference between the ideal mapping $f^\star$ and estimated mapping $f$. The parameters of the network $\symbfit{\theta}$ are updated in a \textbf{backward pass} based on some optimisation criteria, given the value of the loss function. 
+
+
