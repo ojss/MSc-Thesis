@@ -8,6 +8,7 @@
 \usepackage{times}
 \usepackage{epsfig}
 \usepackage{graphicx}
+\usepackage{svg}
 \usepackage{unicode-math}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -71,7 +72,7 @@ filecolor=darkblue,
 urlcolor=darkblue,
 citecolor=tudelft-lavendel}
 
-\usepackage[citestyle=numeric-comp, sorting=ynt, backref=true]{biblatex}
+\usepackage[citestyle=authoryear-comp, sorting=ynt, backref=true]{biblatex}
 \addbibresource{report.bib}
 
 \begin{document}
@@ -139,7 +140,8 @@ citecolor=tudelft-lavendel}
 
 \input{chapters/00_intro}
 
-\input{chapters/02_basics_of_dl}
+% \input{chapters/02_basics_of_dl}
+\import{chapters/}{02_basics_of_dl}
 
 \input{chapters/03_related_work}
 
