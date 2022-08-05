@@ -21,7 +21,7 @@
 \ExecuteOptions{english}
 \ProcessOptions\relax
 
-\LoadClass[10pt]{book}
+\LoadClass[10pt, oneside]{book}
 
 \RequirePackage{amsmath}
 \RequirePackage{amssymb}
@@ -203,7 +203,7 @@
 
 %% Define the TU Delft house style colors.
 \definecolor{tudelft-cyan}{cmyk}{1,0,0,0}
-\definecolor{tudelft-black}{cmyk}{0,0,0,1}
+\definecolor{tudelft-black}{cmyk}{1,1,1,1}
 \definecolor{tudelft-white}{cmyk}{0,0,0,0}
 \definecolor{tudelft-sea-green}{cmyk}{0.54,0,0.32,0}
 \definecolor{tudelft-green}{cmyk}{1,0.15,0.4,0}
@@ -217,6 +217,8 @@
 \definecolor{tudelft-fuchsia}{cmyk}{0.19,1,0,0.19}
 \definecolor{tudelft-bright-green}{cmyk}{0.36,0,1,0}
 \definecolor{tudelft-yellow}{cmyk}{0.02,0,0.54,0}
+\definecolor{forest-green}{cmyk}{0.86,0.0,0.87,0.46}
+\definecolor{grey}{cmyk}{0.0, 0.0, 0.0, 0.15}
 
 \def\@pagecolor{tudelft-cyan}
 %\if@whitetitle
@@ -284,7 +286,7 @@
 \newlength\@cover@fronttextwidth
 \newlength\@cover@fronttextheight
 \newlength\@cover@splitboxwidth
-\setlength\@cover@splitboxwidth{6.375in}
+\setlength\@cover@splitboxwidth{7.375in}
 \newlength\@cover@splitboxheight
 \setlength\@cover@splitboxheight{0.5\paperheight}
 \newlength\@cover@splitboxtextwidth
@@ -382,15 +384,15 @@
         \else
           \ifKV@cover@back
               \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
+                  \includegraphics{cover/logo_white}
               };
               \node at (current page.south east)[anchor=south east,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
+                  \includegraphics{cover/logo_white}
               };
           \else
-              \node at (current page.south west)[anchor=south west,inner sep=20pt]{
-                  \includegraphics{cover/logo_black}
-              };
+            %   \node at (current page.south west)[anchor=south west,inner sep=20pt]{
+            %       \includegraphics{cover/logo_white}
+            %   };
           \fi
         \fi
         %% Calculate the coordinate of the top left corner of the front cover.
@@ -427,26 +429,24 @@
         %% meet.
         \ifKV@cover@split
           \setlength\@cover@fronttextwidth{\@cover@splitboxwidth}
-          \addtolength\@cover@fronttextwidth{-2\@cover@margin}
+        %   \addtolength\@cover@fronttextwidth{-2\@cover@margin}
           \setlength\@cover@fronttextheight{\@cover@splitboxheight}
           \addtolength\@cover@fronttextheight{-4\@cover@margin}
           \coordinate (tcorner) at ($(top left)+(2\@cover@margin,-2\@cover@margin)$);
           \coordinate (front top left) at (tcorner);
 %%          \coordinate (back top left) at ($(tcorner)+(-\@cover@backboxwidth,\@cover@backboxheight)$);     
           \node at (front top left)[anchor=north west,inner sep=\@cover@margin]{
-             \begin{minipage}[t][\@cover@fronttextheight]{\@cover@fronttextwidth}
+             \begin{minipage}[t][\@cover@fronttextheight]{\@cover@fronttextwidth}\centering
                  %% Print the title and optional subtitle at the top in white.
-                   {\titlefont\color{\@titlecolor}\fontsize{58}{58}\selectfont\@title}
+                   {\largetitlestyle\color{\@titlecolor}\fontsize{50}{50}\selectfont\@title}
                     \ifx\@subtitle\undefined\else
-%                     \\[3mm]
-                     \vfill
+                     \\[10mm]
                      
-                     {\titlefont\color{\@subtitlecolor}\fontsize{52}{52}\selectfont\@subtitle}
+                     {\titlefont\color{\@subtitlecolor}\fontsize{30}{30}\selectfont\@subtitle}
                    \fi
                  %% Print the author.
-                   \vfill
-                  
-                   {\titlefont\color{\@authorcolor}\fontsize{52}{52}\selectfont\@author}
+                  \\[10mm]
+                   {\largetitlestyle\color{\@authorcolor}\fontsize{30}{30}\selectfont\@author}
                    \ifx\@cover@text\undefined\else
                      \vfill
                      
@@ -648,8 +648,8 @@
 %% Hyperlinks are cyan, except in print mode, when they are all black.
 \hypersetup{
     colorlinks=true,
-    citecolor=title,
-    linkcolor=title,
-    urlcolor=title
+    citecolor=tudelft-sea-green,
+    linkcolor=tudelft-dark-blue,
+    urlcolor=tudelft-cyan
 }
 

@@ -1,0 +1,190 @@
+\documentclass[whitelogo]{TUD-report2020}
+
+\usepackage{changes}
+\definechangesauthor[name=Ojas, color=tudelft-orange]{ojas}
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{csquotes}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage{svg}
+\usepackage{unicode-math}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{booktabs}
+% Include other packages here, before hyperref.
+\usepackage{stfloats}
+% \usepackage{bm}
+\usepackage{flushend}
+\usepackage{lipsum}
+\usepackage{marginnote}
+\usepackage[ruled,vlined]{algorithm2e}
+% \SetAlFnt{\small}
+% \SetAlCapFnt{\small}
+\usepackage{enumitem}
+\usepackage{arydshln}
+\usepackage{colortbl}
+\usepackage{tabularx}
+\usepackage{ragged2e}
+\usepackage{array}
+\usepackage{threeparttablex}
+\usepackage{makecell}
+\usepackage{overpic}
+\usepackage{pifont}
+\newcommand{\cmark}{\ding{51}}%
+\newcommand{\xmark}{\ding{55}}%
+\usepackage{color}
+\usepackage{url}
+\usepackage[scr=boondoxo]{mathalpha}
+% \usepackage{mathtools}
+
+\usepackage{adjustbox}
+\usepackage{setspace}
+\usepackage{xargs}
+% \usepackage[pdftex,dvipsnames]{xcolor}
+
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{url}            % simple URL typesetting
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{xfrac}          % compact symbols for 1/2, etc.
+\usepackage[verbose=silent]{microtype}      % microtypography
+
+\usepackage{tikz}
+\usepackage{comment}
+\usepackage{wrapfig}
+
+\usepackage[skip=10pt plus1pt, indent=30pt]{parskip}
+\usepackage{pdfpages}
+\usepackage{import}
+\usepackage{pgffor}
+
+\usepackage{hyperref}
+\usepackage[nameinlink, noabbrev, capitalise]{cleveref}
+\definecolor{darkred}{rgb}{0.5,0,0}
+\definecolor{darkgreen}{rgb}{0,0.5,0}
+\definecolor{darkblue}{rgb}{0,0,0.5}
+\definecolor{gray}{rgb}{0.35,0.35,0.35}
+\hypersetup{ colorlinks,
+linkcolor=darkblue,
+filecolor=darkblue,
+urlcolor=darkblue,
+citecolor=tudelft-lavendel}
+
+\usepackage{listings}
+\lstset{
+  basicstyle=\ttfamily\footnotesize,  % Style of the font that is used for the code
+  backgroundcolor=\color{gray!10},    % Background color
+  keywordstyle=\color{red!75!black},  % Keyword style
+  stringstyle=\color{green!40!black}, % String style
+  commentstyle=\color{blue!30!black}, % Comment style
+  numbers=left,                       % Add line numbers on the left side
+  numbersep=5pt,                      % Decrease distance between line numbers and code
+  numberstyle=\tiny,                  % Line number style
+  breaklines=true,                    % Line break automatically
+}
+
+
+
+\usepackage[citestyle=authoryear-comp, sorting=ynt, backref=true]{biblatex}
+\addbibresource{report.bib}
+% \addbibresource{references.bib}
+
+\newcommand{\ccclr}{\texttt{C$^3$LR}}
+\def\samptr{\texttt{SAMPTransfer}}
+
+\begin{document}
+
+\captionsetup{format=plain, font=small, labelfont=bf, justification=RaggedRight}
+%% Use Roman numerals for the page numbers of the title pages and table of
+%% contents.
+\frontmatter
+
+%% Uncomment following 19 lines for a cover with a picture on the lower half only
+% \title[tudelft-white]{Title}
+% \subtitle[tudelft-cyan]{Optional subtitle}
+% \author[tudelft-white]{J.\ Random Author}
+% \affiliation{Technische Universiteit Delft}
+% \coverimage{cover.jpg}
+% \titleoffsetx{10cm}
+% \titleoffsety{10cm}
+% \afiloffsetx{1cm}
+% \afiloffsety{18cm}
+% \covertext[tudelft-white]{
+%     \textbf{Cover Text} \\
+%     possibly \\
+%     spanning 
+%     multiple 
+%     lines
+%     \vfill
+%     ISBN 000-00-0000-000-0
+% }
+% \makecover
+
+%% Uncomment following 16 lines for a cover with a picture on the lower half only
+\title[tudelft-white]{Unsupervised Few Shot Learning}
+\subtitle[tudelft-white]{Learning with Self-supervision and looking beyond single instances}
+\author[tudelft-white]{Ojas Kishorkumar Shirekar}
+\affiliation{Technische Universiteit Delft}
+\coverimage{neural.jpg}
+% \covertext[tudelft-white]{
+%     \textbf{Cover Text} \\
+%     possibly \\
+%     spanning 
+%     multiple 
+%     lines
+%     \vfill
+%     ISBN 000-00-0000-000-0
+% }
+\setpagecolor{tudelft-black}
+\makecover[split]
+
+
+%% Include an optional title page.
+\input{title}
+
+\input{preface}
+
+\tableofcontents
+
+%% Use Arabic numerals for the page numbers of the chapters.
+\mainmatter
+
+
+\chapter{Scientific Article 1 (\ccclr)}
+\includepdf[pages=-, pagecommand={}]{chapters/articles/c3lr/ICIP_C3LR_final.pdf}
+
+\chapter{Scientific Article 2 (\samptr)}
+\includepdf[pages=-, pagecommand={}]{chapters/articles/samp/sampt.pdf}
+% \input{chapter-1}
+
+\listofchanges[title=Comments]
+
+\input{chapters/notation}
+
+\input{chapters/01_intro}
+
+% \input{chapters/02_basics_of_dl}
+\import{chapters/}{02_basics_of_dl}
+
+\import{chapters/}{03_conv_nets}
+
+\input{chapters/04_gnn}
+
+\input{chapters/05_self_supervised}
+
+\input{chapters/06_fsl}
+
+
+
+%% Use letters for the chapter numbers of the appendices.
+\appendix
+
+%\input{appendix-a}
+
+\printbibliography
+
+\end{document}
+

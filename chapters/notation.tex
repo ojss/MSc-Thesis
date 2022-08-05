@@ -1,1 +1,65 @@
-\chapter*{Notation}
+\chapter*{Notation}\label{notation}
+\addcontentsline{toc}{chapter}{Notation}
+
+
+\newcommand{\mA}{\symbfit{A}}
+\newcommand{\mB}{\symbfit{B}}
+\def\mI{\symbfit{I}}
+\def\va{{\symbfit{a}}}
+\def\ve{{\symbfit{e}}}
+
+% Random var
+\def\ra{{\textnormal{a}}}
+\def\rva{{\symbf{a}}}
+\def\rmA{\symbf{\textnormal{A}}}
+% Tensor
+\newcommand{\tens}[1]{\symbfit{\mathsfit{#1}}}
+\def\tA{{\symbf{A}}}
+
+\begin{minipage}{\textwidth}
+% This is a hack to put a little title over the table
+% We cannot use "\section*", etc., they appear in the table of contents.
+% tocdepth does not work on this chapter.
+\centerline{\bf Numbers and Arrays}
+\bgroup
+% The \arraystretch definition here increases the space between rows in the table,
+% so that \displaystyle math has more vertical space.
+\def\arraystretch{1.5}
+\begin{tabular}{cp{5in}}
+$\displaystyle a$ & A scalar (integer or real)\\
+$\displaystyle \va$ & A vector\\
+$\displaystyle \mA$ & A matrix\\
+$\displaystyle \tA$ & A tensor\\
+$\displaystyle \mI_n$ & Identity matrix with $n$ rows and $n$ columns\\
+$\displaystyle \mI$ & Identity matrix with dimensionality implied by context\\
+$\displaystyle \ve^{(i)}$ & Standard basis vector $[0,\dots,0,1,0,\dots,0]$ with a 1 at position $i$\\
+$\displaystyle \text{diag}(\va)$ & A square, diagonal matrix with diagonal entries given by $\va$\\
+$\displaystyle \ra$ & A scalar random variable\\
+$\displaystyle \rva$ & A vector-valued random variable\\
+$\displaystyle \rmA$ & A matrix-valued random variable\\
+\end{tabular}
+\egroup
+\index{Scalar}
+\index{Vector}
+\index{Matrix}
+\index{Tensor}
+\end{minipage}
+
+\begin{minipage}{\textwidth}
+\centerline{\bf Linear Algebra Operations}
+\bgroup
+\def\arraystretch{1.5}
+\begin{tabular}{cp{5in}}
+\centering
+$\mA^\top$ & Transpose of matrix $\mA$ \\
+$\mA^+$ & Moore-Penrose pseudoinverse of $\mA$\\
+$\symbfit{A} \odot \symbfit{B}$ & Element-wise (Hadamard) product of $\mA$ and $\mB$ \\
+% Wikipedia uses \circ for element-wise multiplication but this could be confused with function composition
+$\displaystyle \mathrm{det}(\mA)$ & Determinant of $\mA$ \\
+\end{tabular}
+\egroup
+\index{Transpose}
+\index{Element-wise product|see {Hadamard product}}
+\index{Hadamard product}
+\index{Determinant}
+\end{minipage}
