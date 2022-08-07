@@ -3,6 +3,9 @@
 \newcommand{\mcE}{\mathcal{E}}
 \newcommand{\bfitx}{\symbfit{x}}
 
+\newcommand*{\ldblbrace}{\{\mskip-4mu\{}
+\newcommand*{\rdblbrace}{\}\mskip-3mu\}}
+
 \chapter{Basics of Geometric Deep Learning and Graph Neural Networks}\label{chap:gnn}
 
 \section{Graphs}\label{sec:graphs}
@@ -28,7 +31,7 @@ Permutation invariance is important in \highlight[comment=add ref to article]{\s
 
 
 
-\section{Janossy Pooling}
+\section{Janossy Pooling}\label{sec:janossy-pooling}
 Let us first illustrate the concept of permutation invariance on \textbf{sets}, a special case of graphs without edges ($\mcE=\emptyset$). We illustrate this with the help of a framework provided to us in the form of Janossy pooling \parencite{Murphy2018}.
 
 Currently, there are a few ways to incorporate permutation invariance. The first is the ``permute and average'' paradigm. It works by considering all possible permutations of input elements, then passing each permutation through a permutation-sensitive model or function, and then taking an average of all the results. If two inputs $\symbf{X}$ and $\Tilde{\symbf{X}}$ are permutations of each other, this process will give the same result for both inputs. Mathematically, this can be written as follows:
@@ -43,10 +46,10 @@ This idea is called \textbf{Janossy pooling} and was first introduced by \textci
 \begin{figure}[bh]
     \centering
     \includegraphics[width=\textwidth]{chapters/assets/graph-figs/permuting.pdf}
-    \caption{$\widehat{f}$ comprises everything up to and including the sum. The function $\rho$ coming after the sum is optional and does not need to follow any constraints to guarantee invariance because its input, $\widehat{f}(x)$, is already invariant. Image courtesy of borrowed from \textcite{wagstaff2022universal}.}
+    \caption{$\widehat{f}$ comprises everything up to and including the sum. The function $\rho$ coming after the sum is optional and does not need to follow any constraints to guarantee invariance because its input, $\widehat{f}(x)$, is already invariant. Image courtesy of \textcite{wagstaff2022universal}.}
     \label{fig:basic-perm-invar}
 \end{figure}
-\footnotetext{\url{https://fabianfuchsml.github.io/learningonsets}}
+% \footnotetext{\url{https://fabianfuchsml.github.io/learningonsets}}
 
 \subsection{A More Efficient Janossy Pooling}\label{ssec:efficient-janossy}
 
@@ -118,9 +121,9 @@ rows of $\symbf{X}$. Therefore, applying a permutation matrix $\symbf{P}$ to nod
 \begin{equation}
     f\left(\symbf{P X}, \symbf{P A}^{\top}\right)=f(\symbf{X}, \symbf{A})
 \end{equation}
-and a node-wise function $\phi$ is permutation equivariant if
+and a node-wise function $\rho$ is permutation equivariant if
 \begin{equation}
-    \phi\left(\symbf{P X}, \symbf{P A P}^{\top}\right)=\symbf{P}\phi(\symbf{X}, \symbf{A})
+    \rho\left(\symbf{P X}, \symbf{P A P}^{\top}\right)=\symbf{P}\rho(\symbf{X}, \symbf{A})
 \end{equation}
 
 \subsection{Modelling Relations and Interactions}\label{ssec:relation-and-interactions}
@@ -132,10 +135,6 @@ To illustrate this with a simple example, imagine the task of evaluating how wel
 
 Similar to the above example, $\samptr$ uses \highlight[comment=cite/ref here]{contrastive learning} in order to learn to place semantically similar images closer together in an embedding space. When we increase $k$, we give our model the expressivity to learn to recognise semantic similarities between images and to explicitly take these relations into account. By allowing the model to consider relations between images in a mini-batch, it can better decide which images belong closer together in the feature space and in turn learn better discriminative semantic features. Bear in mind that the image is first passed through a CNN (see \Cref{chap:cnn}), and all the other operations explained here are applied to the flattened output of the CNN.
 
-\section{Graph Neural Networks}\label{sec:graph-nn}
-
-Now that we have described graphs 
-
 
 \section{Janossy Pooling and Self-Attention}\label{sec:jan-attn}
 
@@ -144,20 +143,99 @@ Many of the current neural architectures resemble Janossy pooling with $k=2$.
 The results of the scalar products are used as \textbf{attention weights} to aggregate information from different points using a weighted permutation invariant sum. Although it is similar to binary Janossy pooling, self-attention also uses $\operatorname{softmax}$ to ensure that attention weights sum up to $1$ (see \Cref{sec:softmax}).
 
 To substantiate the relationship between permutation-invariant binary Janossy pooling and self-attention, we first define a natural extension of $k$-ary Janossy pooling from permutation \textit{invariance to equivariance}. In normal binary Janossy pooling, the function $\phi$ acts on every two-tuple, followed by the $\operatorname{sum}$-pooling operation. For the purpose of visualisation and intuition, we will write these two-tuples as a matrix:
-\[
-\begin{bmatrix}
-\phi(\bfitx_1, \bfitx_1) & \phi(\bfitx_2, \bfitx_1) & \cdots & \phi(\bfitx_n, \bfitx_1) \\
-\phi(\bfitx_1, \bfitx_2) & \phi(\bfitx_2, \bfitx_2) & \cdots & \phi(\bfitx_n, \bfitx_2) \\
-\vdots                   &  \vdots              & \ddots & \vdots         \\
-\phi(\bfitx_1, \bfitx_n) & \phi(\bfitx_2, \bfitx_n) & \cdots & \phi(\bfitx_n, \bfitx_n)
-\end{bmatrix}
-\]
+\begin{equation}
+    \begin{bmatrix}
+    \phi(\bfitx_1, \bfitx_1) & \phi(\bfitx_2, \bfitx_1) & \cdots & \phi(\bfitx_n, \bfitx_1) \\
+    \phi(\bfitx_1, \bfitx_2) & \phi(\bfitx_2, \bfitx_2) & \cdots & \phi(\bfitx_n, \bfitx_2) \\
+    \vdots                   &  \vdots              & \ddots & \vdots         \\
+    \phi(\bfitx_1, \bfitx_n) & \phi(\bfitx_2, \bfitx_n) & \cdots & \phi(\bfitx_n, \bfitx_n)
+    \end{bmatrix}
+    \label{eqn:jan-attn-matrix}
+\end{equation}
 
 If we pool over the \textit{entire matrix} we get an invariant output. However, pooling over \textit{each row individually} we get a permutation equivariant output.
-In general we define $k$-ary equivariant Janossy pooling as follows: the $i\textsuperscript{th}$ output is obtained by aggregating overall ($\phi$-transformed) $k$-tuples which start with element $\bfitx_i$. A second network $\rho$ may then further transform each output individually. Mathematically, this reads as:
+In general, we define $k$-ary equivariant Janossy pooling as follows: the $i\textsuperscript{th}$ output is obtained by aggregating the overall ($\phi$-transformed) $k$-tuples which start with the element $\bfitx_i$. A second network $\rho$ may then further transform each output individually. Mathematically, this reads:
 \begin{equation}
-    f_i(\symbf{X}) = \rho \left( \sum_j \phi(\bfitx_i, \bfitx_j) \right)
+    f_i(\symbf{x}) = \rho \left( \sum_j \phi(\bfitx_i, \bfitx_j) \right).
+    \label{eqn:janossy-attention}
 \end{equation}
 
 In practise, however, the process is slightly more involved. Typically, $\phi(\bfitx_i, \bfitx_j)$ is divided into \textbf{attention weights} $w(\bfitx_i, \bfitx_j)$ and \textbf{values} $v(\bfitx_j)$ and a softmax is applied on the attention weights. Furthermore, the attention weights themselves would be born from the scaled dot-product between two affine transformations called the \textbf{query} and \textbf{key}.
-However, the elegant view from the lens of binary Janossy pooling remains clear.
+However, the elegant view from the lens of binary Janossy pooling remains clear. We shall come back to self-attention and its usage in $\samptr$ in later sections.
+
+\section{Graph Neural Networks}\label{sec:graph-nn}
+
+Now that we have described graphs and permutation invariant and equivariant functions, we can begin to talk about Graph Neural Networks (GNNs). GNNs are perhaps among the most \textbf{general} class of deep learning architectures in existence at this moment. Some deep learning architectures can be understood as special cases of the GNN with additional geometric structure. As it happens, we have already covered one such specific case, self-attention in \cref{sec:jan-attn}.
+
+Notice that in \Cref{sec:jan-attn}, the output of $i\textsuperscript{th}$ depends on all pairs of $(i, j)$. However, we can also constrain this so that the $i\textsuperscript{th}$ output is more dependent on \textbf{local} nodes. This means that instead of considering all pairs, the output of node $i$ instead depends on a smaller set of neighbours. We can formalise this to define what we mean when a node is a  \textquote{neighbour} of another node.
+
+The \textbf{neighbourhood} of $i$ is defined as:
+\begin{equation}
+\mathcal{N}_{i}=\{j:(i, j) \in \mathcal{E} \text { or }(j, i) \in \mathcal{E}\}
+\end{equation}
+and the neighbourhood features as the multiset:
+\begin{equation}
+\symbf{X}_{\mathcal{N}_{i}}=\ldblbrace\bfitx_{j}: j \in \mathcal{N}_{i}\rdblbrace .
+\end{equation}
+
+Further generalising on our perspective developed in \Cref{sec:janossy-pooling} and \Cref{sec:jan-attn}, we can specify a function $\varphi(\bfitx_i, \symbf{X}_{\mathcal{N}_{i}})$ that is locality aware and can operate over a node and its neighbourhood. Then a permutation equivariant function $h$ can be constructed by applying $\varphi$ to every node's neighbourhood separately:
+\begin{equation}
+    h({\symbf X}, {\symbf A}) =
+\left[
+  \begin{array}{ccc}
+     & \varphi(\bfitx_1, \symbf{X}_{\mathcal{N}_1}) &  \\
+     & \varphi(\bfitx_2, \symbf{X}_{\mathcal{N}_2}) &  \\
+             & \vdots    &          \\
+     & \varphi(\bfitx_n, \symbf{X}_{\mathcal{N}_n}) & 
+  \end{array}
+\right].
+\label{eq:graph_equivariant}
+\end{equation}
+
+As $h$ is constructed by applying a shared function $\varphi$ to each node locally, its permutation equivariance rests on the output of $\varphi$ being independent of the ordering of the nodes in $\mathcal{N}_i$. Therefore, if $\varphi$ is built to be permutation invariant, then this property will be satisfied. Observe that the role $\varphi$ plays here is that of $\widehat{f}$ in \Cref{eqn:perm-invar-avg} and role played by $h$ is similar to that of $f$ in \Cref{eqn:janossy-attention}.
+
+\begin{figure}[th]
+    \centering
+    \includegraphics[width=\linewidth]{chapters/assets/graph-figs/GC_GDL.eps}
+    \caption{By applying a permutation-invariant function $\varphi$ to every neighbourhood. In this case, $\varphi$ is applied to the features $\bfitx_b$ of node $b$ as well as the multiset  of its neighbourhood features, $\symbf{X}_{\mathcal{N}_b} = \ldblbrace\bfitx_a, \bfitx_b, \bfitx_c, \bfitx_d, \bfitx_e\rdblbrace$. Applying $\varphi$ in this manner to every node's neighbourhood recovers the rows of the resulting matrix of latent features $\symbf{Z}=h(\symbf{X}, \symbf{A})$. Image modified from \parencite{Bronstein2021}.}
+    \label{fig:gc_gdl}
+\end{figure}%
+
+A GNN is a optimisable transformation on the attributes of a graph (nodes, edges, global-context) that preserves permutation invariance.
+Based on our discussion in \Cref{ssec:deep-sets}, we consider a graph to be specificed with an adjacency matrix $\symbf{A}$ and node features $\symbf{X}$. We will discuss GNN architectures that are \textbf{permutation equivariant} functions $h(\symbf{X}, \symbf{A})$ constructed by applying shared permutation invariant functions $\varphi(\bfitx_i, \symbf{X}_{\mathcal{N}_i})$ where $\symbf{X}_{\mathcal{N}_i}$ is the neighbourhood of $\bfitx_i$. This local function $\varphi$ can be referred to as \textquote{diffusion}, \textquote{propagation}, or \textquote{message-passing}, and the over computation $h$ is referred to as a GNN layer.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.33\linewidth]{chapters/assets/graph-figs/GNN_GDL_TYPES_C.eps}
+    \hspace{-0.5em}
+    \includegraphics[width=0.33\linewidth]{chapters/assets/graph-figs/GNN_GDL_TYPES_A.eps}
+    \hspace{-0.5em}
+    \includegraphics[width=0.33\linewidth]{chapters/assets/graph-figs/GNN_GDL_TYPES_MP.eps}
+    \caption{A visualisation of the dataflow for the three flavours of GNN layers, $g$. We use the neighbourhood of node $b$ from Figure \ref{fig:gc_gdl} to illustrate this. Left-to-right: \textbf{convolutional}, where sender node features are multiplied with a constant, $c_{uv}$; \textbf{attentional}, where this multiplier is \emph{implicitly} computed via an attention mechanism of the receiver over the sender: $\alpha_{ij}=a(\vec{x}_i, \vec{x}_j)$; and \textbf{message-passing}, where vector-based messages are computed based on both the sender and receiver: $\vec{m}_{ij}=\psi(\vec{x}_i, \vec{x}_j)$.}
+    \label{fig:gc_flavours}
+\end{figure}%
+
+There are three types of GNN layers that are most common, in all three of them permutation invariance is satisfied by \textbf{aggregating} features from $\symbf{X}_{\mathcal{N}_i}$ (potentially transformed by another function $\psi$) with some permutation-invariant function $\bigoplus$, and then \textbf{updating} the features of node $i$, by means of some function $\varphi$. Usually, $\varphi$ and $\psi$ are learnable affine transformations with activation functions (see \Cref{chap:basics-of-dl}) and $\bigoplus$ is an operation such as $\operatorname{sum}$, $\operatorname{mean}$, or $\operatorname{max}$. These operations are analogous to pooling functions discussed in \Cref{sec:conv-pooling}.
+
+In the \textbf{convolutional} kind of GNNs \parencite{kipf2016semi}, the features of the neighbourhood nodes are directly aggregate with fixed weights,
+\begin{equation}
+    z_{u}=\varphi\left(\bfitx_{i}, \bigoplus_{j \in \mathcal{N}_{i}} c_{i j} \psi\left(\bfitx_{j}\right)\right).
+    \label{eqn:gcn}
+\end{equation}
+Here, $c_{ij}$ specifies the importance of node $i$ to node $j$'s representation.
+
+In the attentional scheme \parencite{velic018graph, brody2021attentive}, the interactions are implicit
+\begin{equation}
+z_{i}=\varphi\left(\bfitx_{u}, \bigoplus_{j \in \mathcal{N}_{i}} a\left(\bfitx_{i}, \bfitx_{j}\right) \psi\left(\bfitx_{j}\right)\right)
+\label{eqn:attn-gnn}
+\end{equation}
+Here, $a$ is a learnable \textbf{self-attention} mechanism that computes the importance coefficients $\alpha_{ij} = a(\bfitx_i,\bfitx_j)$ implicitly. They are often softmax-normalised across all neighbours. If the aggregation operation $\bigoplus$ is summation, then the aggregation is a linear combination of the neighbourhood node features, but the weights are feature-dependent. The reader is urged to recognise the similarities between \Cref{eqn:attn-gnn} and \Cref{eqn:janossy-attention}.
+
+Finally, the \textbf{message-passing} type amounts to computing arbitrary vectors (\textquote{messages}) across edges,
+\begin{equation}
+    z_{i}=\varphi\left(\bfitx_{i}, \bigoplus_{j \in \mathcal{N}_{i}} \psi\left(\bfitx_{i}, \bfitx_{j}\right)\right)
+    \label{eqn:mesg-passing}
+\end{equation}
+Here, $\psi$ is a learnable message function, computing $j$'s vector sent to $i$, and the aggregation can be considered as a form of message passing on the graph.
+
+It must be noted that the relationship between the three approaches is as follows, \textit{convolution} $\subseteq$ \textit{attention} $\subseteq$ \textit{message-passing}. The attentional mechanism can represent convolutional GNNs by an attention-mechanism implemented as a lookup table $a(\bfitx_i, \bfitx_j) = c_{ij}$. Message-passing can represent both convolutional and attentional GNNs where the messages are only the sender node's features: $\psi(\bfitx_i, \bfitx_j)=c_{ij}\psi(\bfitx_j)$ for convolutional GNNs and $\psi(\bfitx_i, \bfitx_j)=a\left(\bfitx_{i}, \bfitx_{j}\right)\psi(\bfitx_j)$ for attentional GNNs. $\samptr$ makes use of the attentional semantics in the message-passing context to implement its GNN, however the implementation of the attention mechanism follows \parencite{vaswani2017attention} instead of the mechanism suggested in \parencite{velic018graph}.
