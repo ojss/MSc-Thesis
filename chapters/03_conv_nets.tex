@@ -141,7 +141,7 @@ Pooling operations replace the linear combination described by the kernel with s
 
 
 \newpage
-\section{Kernels as Feature Extractors}\label{sec: kernel-feature-extractor}
+\section{Kernels as Feature Extractors}\label{sec:kernel-feature-extractor}
 Each convolutional layer is characterised by the size of the kernels, the number of kernels, the padding and \textbf{stride}; the relationship between these components is not trivial to intuitively infer. Every kernel's weights act as a particular feature detector, and thus learning the kernel's weights translates into learning the features. \Cref{fig:feature-viz} shows the types of features and patterns learnt by a fully trained model in various layers. Note that as the number of layers increases, the network is learning more and more specific and complex patterns.
 
 \begin{figure}[ht]

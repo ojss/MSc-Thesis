@@ -1,6 +1,6 @@
 \chapter{Introduction}\label{sec:intro}
 
-In recent years we have seen deep learning models grow larger and demand increasingly more data to perform their tasks satisfactorily. 
+\highlight[comment=this section will be rewritten and cleaned up]{In recent years} we have seen deep learning models grow larger and demand increasingly more data to perform their tasks satisfactorily. 
 On the other-hand few-shot learning has been gathering increasing interest recently because it underscores a fundamental gap between smart human adaptability and data-hungry supervised and unsupervised deep learning methods. To tackle this challenge, few-shot classification is cast as a task of predicting class labels for a set of unlabelled data points (\textit{query set}) given only a small set of labelled data points (\textit{support set}). Typically, the query and support data points are drawn from the same distribution. 
 
 Few-shot classification methods typically comprise of two sequential phases: (i) \textit{pre-training} on a large dataset of ``base'' classes, regardless of the training being supervised or unsupervised. This is followed by (ii) \textit{fine-tuning} on an unseen dataset consisting of ``novel'' classes. Normally, the classes used in the pre-training and fine-tuning are mutually exclusive. In this paper, our focus is on the self-supervised (also sometimes interchangeably called ``unsupervised'' in the literature) setting where we have no access to the actual class labels of the ``base'' dataset.

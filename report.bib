@@ -44,6 +44,23 @@
 	abstract     = {Let $M(x)$ be a regression function which has a maximum at the unknown point $\theta. M(x)$ is itself unknown to the statistician who, however, can take observations at any level $x$. This paper gives a scheme whereby, starting from an arbitrary point $x_1$, one obtains successively $x_2, x_3, \cdots$ such that $x_n$ converges to $\theta$ in probability as $n \rightarrow \infty$.},
 	issue        = 3
 }
+@article{Fukushima1975,
+	title        = {Cognitron: A self-organizing multilayered neural network},
+	author       = {Kunihiko Fukushima},
+	year         = 1975,
+	month        = 9,
+	journal      = {Biological Cybernetics 1975 20:3},
+	publisher    = {Springer},
+	volume       = 20,
+	pages        = {121--136},
+	doi          = {10.1007/BF00342633},
+	issn         = {1432-0770},
+	url          = {https://link-springer-com.tudelft.idm.oclc.org/article/10.1007/BF00342633},
+	abstract     = {A new hypothesis for the organization of synapses between neurons is proposed: “The synapse from neuron x to neuron y is reinforced when x fires provided that no neuron in the vicinity of y is firing stronger than y”. By introducing this hypothesis, a new algorithm with which a multilayered neural network is effectively organized can be deduced. A self-organizing multilayered neural network, which is named “cognitron”, is constructed following this algorithm, and is simulated on a digital computer. Unlike the organization of a usual brain models such as a three-layered perceptron, the self-organization of a cognitron progresses favorably without having a “teacher” which instructs in all particulars how the individual cells respond. After repetitive presentations of several stimulus patterns, the cognitron is self-organized in such a way that the receptive fields of the cells become relatively larger in a deeper layer. Each cell in the final layer integrates the information from whole parts of the first layer and selectively responds to a specific stimulus pattern or a feature.},
+	issue        = 3,
+	keywords     = {Bioinformatics,Complex Systems,Computer Appl. in Life Sciences,Neurobiology,Neurosciences},
+	pmid         = 1203338
+}
 @article{Micchelli1986,
 	title        = {Interpolation of scattered data: Distance matrices and conditionally positive definite functions},
 	author       = {Charles A. Micchelli},
@@ -231,6 +248,19 @@
 	url          = {https://arxiv.org/abs/1606.04838},
 	abstract     = {This paper provides a review and commentary on the past, present, and future of numerical optimization algorithms in the context of machine learning applications. Through case studies on text classification and the training of deep neural networks, we discuss how optimization problems arise in machine learning and what makes them challenging. A major theme of our study is that large-scale machine learning represents a distinctive setting in which the stochastic gradient (SG) method has traditionally played a central role while conventional gradient-based nonlinear optimization techniques typically falter. Based on this viewpoint, we present a comprehensive theory of a straightforward, yet versatile SG algorithm, discuss its practical behavior, and highlight opportunities for designing algorithms with improved performance. This leads to a discussion about the next generation of optimization methods for large-scale machine learning, including an investigation of two main streams of research on techniques that diminish noise in the stochastic directions and methods that make use of second-order derivative approximations.}
 }
+@book{GoodfellowDLBook2016,
+	title        = {Deep Learning},
+	author       = {Ian Goodfellow and Yoshua Bengio and Aaron Courville},
+	year         = 2016,
+	publisher    = {MIT Press},
+	note         = {\url{http://www.deeplearningbook.org}}
+}
+@article{kipf2016semi,
+	title        = {Semi-supervised classification with graph convolutional networks},
+	author       = {Kipf, Thomas N and Welling, Max},
+	year         = 2016,
+	journal      = {arXiv preprint arXiv:1609.02907}
+}
 @inproceedings{Finn2017Model-agnosticNetworks,
 	title        = {Model-agnostic meta-learning for fast adaptation of deep networks},
 	author       = {Finn, Chelsea and Abbeel, Pieter and Levine, Sergey},
@@ -304,6 +334,13 @@
 	abstract     = {Convolutional networks used for computer vision represent candidate models for the computations performed in mammalian visual systems. We use them as a detailed model of human brain activity during the viewing of natural images by constructing predictive models based on their different layers and BOLD fMRI activations. Analyzing the predictive performance across layers yields characteristic fingerprints for each visual brain region: early visual areas are better described by lower level convolutional net layers and later visual areas by higher level net layers, exhibiting a progression across ventral and dorsal streams. Our predictive model generalizes beyond brain responses to natural images. We illustrate this on two experiments, namely retinotopy and face-place oppositions, by synthesizing brain activity and performing classical brain mapping upon it. The synthesis recovers the activations observed in the corresponding fMRI studies, showing that this deep encoding model captures representations of brain function that are universal across experimental paradigms.},
 	pmid         = 27777172
 }
+@article{zaheer2017deep,
+	title        = {Deep sets},
+	author       = {Zaheer, Manzil and Kottur, Satwik and Ravanbakhsh, Siamak and Poczos, Barnabas and Salakhutdinov, Russ R and Smola, Alexander J},
+	year         = 2017,
+	journal      = {Advances in neural information processing systems},
+	volume       = 30
+}
 @inproceedings{garcia2018fewshot,
 	title        = {Few-Shot Learning with Graph Neural Networks},
 	author       = {Victor Garcia Satorras and Joan Bruna Estrach},
@@ -373,6 +410,22 @@
 	issue        = 1,
 	keywords     = {Learning algorithms,Object vision},
 	pmid         = 30271987
+}
+@article{Murphy2018,
+	title        = {Janossy Pooling: Learning Deep Permutation-Invariant Functions for Variable-Size Inputs},
+	author       = {Ryan L. Murphy and Balasubramaniam Srinivasan and Bruno Ribeiro and Vinayak Rao},
+	year         = 2018,
+	month        = 11,
+	journal      = {7th International Conference on Learning Representations, ICLR 2019},
+	publisher    = {International Conference on Learning Representations, ICLR},
+	url          = {https://arxiv.org/abs/1811.01900v3},
+	abstract     = {We consider a simple and overarching representation for permutation-invariant functions of sequences (or multiset functions). Our approach, which we call Janossy pooling, expresses a permutation-invariant function as the average of a permutation-sensitive function applied to all reorderings of the input sequence. This allows us to leverage the rich and mature literature on permutation-sensitive functions to construct novel and flexible permutation-invariant functions. If carried out naively, Janossy pooling can be computationally prohibitive. To allow computational tractability, we consider three kinds of approximations: canonical orderings of sequences, functions with $k$-order interactions, and stochastic optimization algorithms with random permutations. Our framework unifies a variety of existing work in the literature, and suggests possible modeling and algorithmic extensions. We explore a few in our experiments, which demonstrate improved performance over current state-of-the-art methods.}
+}
+@article{gidaris2018unsupervised,
+	title        = {Unsupervised representation learning by predicting image rotations},
+	author       = {Gidaris, Spyros and Singh, Praveer and Komodakis, Nikos},
+	year         = 2018,
+	journal      = {arXiv preprint arXiv:1803.07728}
 }
 @article{Antoniou2019AssumeAugmentation,
 	title        = {Assume, augment and learn: Unsupervised few-shot meta-learning via random labels and data augmentation},
@@ -447,6 +500,12 @@
 	author       = {Wang, Yan and Chao, Wei-Lun and Weinberger, Kilian Q and van der Maaten, Laurens},
 	year         = 2019,
 	journal      = {arXiv preprint arXiv:1911.04623}
+}
+@article{Lee2018,
+	title        = {{Set Transformer: A Framework for Attention-Based Permutation-Invariant Neural Networks}},
+	author       = {Lee, Juho and Lee, Yoonho and Kim, Jungtaek and Kosiorek, Adam and Choi, Seungjin and Teh, Yee Whye},
+	year         = 2019,
+	journal      = {International Conference on Machine Learning (ICML)}
 }
 @article{boudiaf2020information,
 	title        = {Information maximization for few-shot learning},
@@ -595,6 +654,25 @@
 	url          = {https://arxiv.org/abs/2010.11929v2},
 	abstract     = {While the Transformer architecture has become the de-facto standard for natural language processing tasks, its applications to computer vision remain limited. In vision, attention is either applied in conjunction with convolutional networks, or used to replace certain components of convolutional networks while keeping their overall structure in place. We show that this reliance on CNNs is not necessary and a pure transformer applied directly to sequences of image patches can perform very well on image classification tasks. When pre-trained on large amounts of data and transferred to multiple mid-sized or small image recognition benchmarks (ImageNet, CIFAR-100, VTAB, etc.), Vision Transformer (ViT) attains excellent results compared to state-of-the-art convolutional networks while requiring substantially fewer computational resources to train.}
 }
+@article{Mangla2020,
+	title        = {Charting the right manifold: Manifold mixup for few-shot learning},
+	author       = {Puneet Mangla and Mayank Singh and Abhishek Sinha and Nupur Kumari and Vineeth N. Balasubramanian and Balaji Krishnamurthy},
+	year         = 2020,
+	journal      = {Proceedings - 2020 IEEE Winter Conference on Applications of Computer Vision, WACV 2020},
+	pages        = {2207--2216},
+	doi          = {10.1109/WACV45572.2020.9093338},
+	isbn         = 9781728165530,
+	abstract     = {Few-shot learning algorithms aim to learn model parameters capable of adapting to unseen classes with the help of only a few labeled examples. A recent regularization technique - Manifold Mixup focuses on learning a general-purpose representation, robust to small changes in the data distribution. Since the goal of few-shot learning is closely linked to robust representation learning, we study Manifold Mixup in this problem setting. Self-supervised learning is another technique that learns semantically meaningful features, using only the inherent structure of the data. This work investigates the role of learning relevant feature manifold for few-shot tasks using self-supervision and regularization techniques. We observe that regularizing the feature manifold, enriched via self-supervised techniques, with Manifold Mixup significantly improves few-shot learning performance. We show that our proposed method S2M2 beats the current state-of-the-art accuracy on standard few-shot learning datasets like CIFAR-FS, CUB, mini-ImageNet and tiered-ImageNet by 3 - 8\%. Through extensive experimentation, we show that the features learned using our approach generalize to complex few-shot evaluation tasks, cross-domain scenarios and are robust against slight changes to data distribution.}
+}
+@article{Dwivedi2020,
+	title        = {A Generalization of Transformer Networks to Graphs},
+	author       = {Vijay Prakash Dwivedi and Xavier Bresson},
+	year         = 2020,
+	month        = 12,
+	doi          = {10.48550/arxiv.2012.09699},
+	url          = {https://arxiv.org/abs/2012.09699v2},
+	abstract     = {We propose a generalization of transformer neural network architecture for arbitrary graphs. The original transformer was designed for Natural Language Processing (NLP), which operates on fully connected graphs representing all connections between the words in a sequence. Such architecture does not leverage the graph connectivity inductive bias, and can perform poorly when the graph topology is important and has not been encoded into the node features. We introduce a graph transformer with four new properties compared to the standard model. First, the attention mechanism is a function of the neighborhood connectivity for each node in the graph. Second, the positional encoding is represented by the Laplacian eigenvectors, which naturally generalize the sinusoidal positional encodings often used in NLP. Third, the layer normalization is replaced by a batch normalization layer, which provides faster training and better generalization performance. Finally, the architecture is extended to edge feature representation, which can be critical to tasks s.a. chemistry (bond type) or link prediction (entity relationship in knowledge graphs). Numerical experiments on a graph benchmark demonstrate the performance of the proposed graph transformer architecture. This work closes the gap between the original transformer, which was designed for the limited case of line graphs, and graph neural networks, that can work with arbitrary graphs. As our architecture is simple and generic, we believe it can be used as a black box for future applications that wish to consider transformer and graphs.}
+}
 @article{brody2021attentive,
 	title        = {How attentive are graph attention networks?},
 	author       = {Brody, Shaked and Alon, Uri and Yahav, Eran},
@@ -729,6 +807,21 @@
 	issue        = 10,
 	pmid         = 32027584
 }
+@article{Bronstein2021,
+	title        = {Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges},
+	author       = {Michael M. Bronstein and Joan Bruna and Taco Cohen and Petar Veličković},
+	year         = 2021,
+	url          = {http://arxiv.org/abs/2104.13478},
+	abstract     = {The last decade has witnessed an experimental revolution in data science and machine learning, epitomised by deep learning methods. Indeed, many high-dimensional learning tasks previously thought to be beyond reach -- such as computer vision, playing Go, or protein folding -- are in fact feasible with appropriate computational scale. Remarkably, the essence of deep learning is built from two simple algorithmic principles: first, the notion of representation or feature learning, whereby adapted, often hierarchical, features capture the appropriate notion of regularity for each task, and second, learning by local gradient-descent type methods, typically implemented as backpropagation. While learning generic functions in high dimensions is a cursed estimation problem, most tasks of interest are not generic, and come with essential pre-defined regularities arising from the underlying low-dimensionality and structure of the physical world. This text is concerned with exposing these regularities through unified geometric principles that can be applied throughout a wide spectrum of applications. Such a 'geometric unification' endeavour, in the spirit of Felix Klein's Erlangen Program, serves a dual purpose: on one hand, it provides a common mathematical framework to study the most successful neural network architectures, such as CNNs, RNNs, GNNs, and Transformers. On the other hand, it gives a constructive procedure to incorporate prior physical knowledge into neural architectures and provide principled way to build future architectures yet to be invented.}
+}
+@article{Goyal2021,
+	title        = {Self-supervised Pretraining of Visual Features in the Wild},
+	author       = {Priya Goyal and Mathilde Caron and Benjamin Lefaudeux and Min Xu and Pengchao Wang and Vivek Pai and Mannat Singh and Vitaliy Liptchinsky and Ishan Misra and Armand Joulin and Piotr Bojanowski},
+	year         = 2021,
+	month        = 3,
+	doi          = {10.48550/arxiv.2103.01988},
+	url          = {https://arxiv.org/abs/2103.01988v2}
+}
 @inproceedings{bardes2022vicreg,
 	title        = {{VICR}eg: Variance-Invariance-Covariance Regularization for Self-Supervised Learning},
 	author       = {Adrien Bardes and Jean Ponce and Yann LeCun},
@@ -832,80 +925,12 @@
 	booktitle    = {Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
 	pages        = {9078--9088}
 }
-@book{GoodfellowDLBook2016,
-    title={Deep Learning},
-    author={Ian Goodfellow and Yoshua Bengio and Aaron Courville},
-    publisher={MIT Press},
-    note={\url{http://www.deeplearningbook.org}},
-    year={2016}
-}
-
-@article{Fukushima1975,
-   abstract = {A new hypothesis for the organization of synapses between neurons is proposed: “The synapse from neuron x to neuron y is reinforced when x fires provided that no neuron in the vicinity of y is firing stronger than y”. By introducing this hypothesis, a new algorithm with which a multilayered neural network is effectively organized can be deduced. A self-organizing multilayered neural network, which is named “cognitron”, is constructed following this algorithm, and is simulated on a digital computer. Unlike the organization of a usual brain models such as a three-layered perceptron, the self-organization of a cognitron progresses favorably without having a “teacher” which instructs in all particulars how the individual cells respond. After repetitive presentations of several stimulus patterns, the cognitron is self-organized in such a way that the receptive fields of the cells become relatively larger in a deeper layer. Each cell in the final layer integrates the information from whole parts of the first layer and selectively responds to a specific stimulus pattern or a feature.},
-   author = {Kunihiko Fukushima},
-   doi = {10.1007/BF00342633},
-   issn = {1432-0770},
-   issue = {3},
-   journal = {Biological Cybernetics 1975 20:3},
-   keywords = {Bioinformatics,Complex Systems,Computer Appl. in Life Sciences,Neurobiology,Neurosciences},
-   month = {9},
-   pages = {121-136},
-   pmid = {1203338},
-   publisher = {Springer},
-   title = {Cognitron: A self-organizing multilayered neural network},
-   volume = {20},
-   url = {https://link-springer-com.tudelft.idm.oclc.org/article/10.1007/BF00342633},
-   year = {1975},
-}
-
-@article{Bronstein2021,
-   abstract = {The last decade has witnessed an experimental revolution in data science and machine learning, epitomised by deep learning methods. Indeed, many high-dimensional learning tasks previously thought to be beyond reach -- such as computer vision, playing Go, or protein folding -- are in fact feasible with appropriate computational scale. Remarkably, the essence of deep learning is built from two simple algorithmic principles: first, the notion of representation or feature learning, whereby adapted, often hierarchical, features capture the appropriate notion of regularity for each task, and second, learning by local gradient-descent type methods, typically implemented as backpropagation. While learning generic functions in high dimensions is a cursed estimation problem, most tasks of interest are not generic, and come with essential pre-defined regularities arising from the underlying low-dimensionality and structure of the physical world. This text is concerned with exposing these regularities through unified geometric principles that can be applied throughout a wide spectrum of applications. Such a 'geometric unification' endeavour, in the spirit of Felix Klein's Erlangen Program, serves a dual purpose: on one hand, it provides a common mathematical framework to study the most successful neural network architectures, such as CNNs, RNNs, GNNs, and Transformers. On the other hand, it gives a constructive procedure to incorporate prior physical knowledge into neural architectures and provide principled way to build future architectures yet to be invented.},
-   author = {Michael M. Bronstein and Joan Bruna and Taco Cohen and Petar Veličković},
-   title = {Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges},
-   url = {http://arxiv.org/abs/2104.13478},
-   year = {2021},
-}
-
-@article{Murphy2018,
-   abstract = {We consider a simple and overarching representation for permutation-invariant functions of sequences (or multiset functions). Our approach, which we call Janossy pooling, expresses a permutation-invariant function as the average of a permutation-sensitive function applied to all reorderings of the input sequence. This allows us to leverage the rich and mature literature on permutation-sensitive functions to construct novel and flexible permutation-invariant functions. If carried out naively, Janossy pooling can be computationally prohibitive. To allow computational tractability, we consider three kinds of approximations: canonical orderings of sequences, functions with $k$-order interactions, and stochastic optimization algorithms with random permutations. Our framework unifies a variety of existing work in the literature, and suggests possible modeling and algorithmic extensions. We explore a few in our experiments, which demonstrate improved performance over current state-of-the-art methods.},
-   author = {Ryan L. Murphy and Balasubramaniam Srinivasan and Bruno Ribeiro and Vinayak Rao},
-   journal = {7th International Conference on Learning Representations, ICLR 2019},
-   month = {11},
-   publisher = {International Conference on Learning Representations, ICLR},
-   title = {Janossy Pooling: Learning Deep Permutation-Invariant Functions for Variable-Size Inputs},
-   url = {https://arxiv.org/abs/1811.01900v3},
-   year = {2018},
-}
-
-@article{zaheer2017deep,
-  title={Deep sets},
-  author={Zaheer, Manzil and Kottur, Satwik and Ravanbakhsh, Siamak and Poczos, Barnabas and Salakhutdinov, Russ R and Smola, Alexander J},
-  journal={Advances in neural information processing systems},
-  volume={30},
-  year={2017}
-}
-
-@article{Lee2018,
-  title={{Set Transformer: A Framework for Attention-Based Permutation-Invariant Neural Networks}},
-  author={Lee, Juho and Lee, Yoonho and Kim, Jungtaek and Kosiorek, Adam and Choi, Seungjin and Teh, Yee Whye},
-  journal={International Conference on Machine Learning (ICML)},
-  year={2019}
-}
-
 @article{wagstaff2022universal,
-  title={Universal approximation of functions on sets},
-  author={Wagstaff, Edward and Fuchs, Fabian B and Engelcke, Martin and Osborne, Michael A and Posner, Ingmar},
-  journal={Journal of Machine Learning Research},
-  volume={23},
-  number={151},
-  pages={1--56},
-  year={2022}
+	title        = {Universal approximation of functions on sets},
+	author       = {Wagstaff, Edward and Fuchs, Fabian B and Engelcke, Martin and Osborne, Michael A and Posner, Ingmar},
+	year         = 2022,
+	journal      = {Journal of Machine Learning Research},
+	volume       = 23,
+	number       = 151,
+	pages        = {1--56}
 }
-
-@article{kipf2016semi,
-  title={Semi-supervised classification with graph convolutional networks},
-  author={Kipf, Thomas N and Welling, Max},
-  journal={arXiv preprint arXiv:1609.02907},
-  year={2016}
-}
-

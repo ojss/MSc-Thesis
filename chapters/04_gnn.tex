@@ -2,6 +2,9 @@
 \newcommand{\mcV}{\mathcal{V}}
 \newcommand{\mcE}{\mathcal{E}}
 \newcommand{\bfitx}{\symbfit{x}}
+\newcommand{\Wq}{\symbfit{W}_q}
+\newcommand{\Wk}{\symbfit{W}_k}
+\newcommand{\Wv}{\symbfit{W}_v}
 
 \newcommand*{\ldblbrace}{\{\mskip-4mu\{}
 \newcommand*{\rdblbrace}{\}\mskip-3mu\}}
@@ -201,8 +204,8 @@ As $h$ is constructed by applying a shared function $\varphi$ to each node local
     \label{fig:gc_gdl}
 \end{figure}%
 
-A GNN is a optimisable transformation on the attributes of a graph (nodes, edges, global-context) that preserves permutation invariance.
-Based on our discussion in \Cref{ssec:deep-sets}, we consider a graph to be specificed with an adjacency matrix $\symbf{A}$ and node features $\symbf{X}$. We will discuss GNN architectures that are \textbf{permutation equivariant} functions $h(\symbf{X}, \symbf{A})$ constructed by applying shared permutation invariant functions $\varphi(\bfitx_i, \symbf{X}_{\mathcal{N}_i})$ where $\symbf{X}_{\mathcal{N}_i}$ is the neighbourhood of $\bfitx_i$. This local function $\varphi$ can be referred to as \textquote{diffusion}, \textquote{propagation}, or \textquote{message-passing}, and the over computation $h$ is referred to as a GNN layer.
+A GNN is a optimisable transformation on the attributes of a graph (nodes, edges, global context) that preserves permutation invariance.
+Based on our discussion in \Cref{ssec:deep-sets}, we consider a graph to be specified with an adjacency matrix $\symbf{A}$ and node features $\symbf{X}$. We will discuss GNN architectures that are \textbf{permutation equivariant} functions $h(\symbf{X}, \symbf{A})$ constructed by applying shared permutation invariant functions $\varphi(\bfitx_i, \symbf{X}_{\mathcal{N}_i})$ where $\symbf{X}_{\mathcal{N}_i}$ is the neighbourhood of $\bfitx_i$. This local function $\varphi$ can be referred to as \textquote{diffusion}, \textquote{propagation}, or \textquote{message-passing}, and the computation $h$ is referred to as a GNN layer.
 
 \begin{figure}
     \centering
@@ -239,3 +242,45 @@ Finally, the \textbf{message-passing} type amounts to computing arbitrary vector
 Here, $\psi$ is a learnable message function, computing $j$'s vector sent to $i$, and the aggregation can be considered as a form of message passing on the graph.
 
 It must be noted that the relationship between the three approaches is as follows, \textit{convolution} $\subseteq$ \textit{attention} $\subseteq$ \textit{message-passing}. The attentional mechanism can represent convolutional GNNs by an attention-mechanism implemented as a lookup table $a(\bfitx_i, \bfitx_j) = c_{ij}$. Message-passing can represent both convolutional and attentional GNNs where the messages are only the sender node's features: $\psi(\bfitx_i, \bfitx_j)=c_{ij}\psi(\bfitx_j)$ for convolutional GNNs and $\psi(\bfitx_i, \bfitx_j)=a\left(\bfitx_{i}, \bfitx_{j}\right)\psi(\bfitx_j)$ for attentional GNNs. $\samptr$ makes use of the attentional semantics in the message-passing context to implement its GNN, however the implementation of the attention mechanism follows \parencite{vaswani2017attention} instead of the mechanism suggested in \parencite{velic018graph}.
+
+\section{Self-Attention}\label{sec:self-attention}
+
+We shall close out the discussion on geometric deep learning and GNNs by following up on \Cref{sec:janossy-pooling} and going into a bit more detail about how self-attention. While our geometric deep learning based perspective is still valid, there are several details that affect the implementation, although the form of self-attention remains the same as we have discussed in earlier sections.
+
+\subsection{Query, Key and Value}\label{sec:attn-qkv}
+We have already alluded to queries, keys and values in \Cref{eqn:janossy-attention}, these three entities form the major components of self-attention. These entities are also what makes self-attention based GNNs more expressive than the standard attention scheme (\Cref{eqn:attn-gnn}) \parencite{brody2021attentive, Bronstein2021, Dwivedi2020}.
+
+Every graph attention layer uses each input node $\bfitx_i$ in three different ways:
+\begin{itemize}
+    \item It is compared to every other vector to establish the weights for its own output $\symbfit{z}_i$
+    \item It is compared to every other vector to establish the weights for the output of the $j\textsuperscript{th}$ vector $\symbfit{z}_j$
+    \item It is used as part of the weighted sum to compute each output vector once the weights have been established.
+\end{itemize}
+
+These roles are called \textbf{query}, \textbf{key}, and \textbf{value}, respectively. Each input node $\bfitx_i$ is linearly transformed three different times to derive a new vector for each of the roles. In other words, we use three $d\times d$ weight matrices $\Wq$, $\Wk$ and $\Wv$ to compute three linear transformations:
+\begin{equation}
+    \symbfit{q}_{i}=\symbfit{W}_{q} \bfitx_{i} \quad \symbfit{k}_{i}=\symbfit{W}_{k} \bfitx_{i} \quad \symbfit{v}_{i}=\symbfit{W}_{v} \bfitx_{i}
+\end{equation}
+these transformations allow the attention module a fair degree of flexibility, allowing it to project the input to suit the roles they must be a part of. 
+
+The \highlight[comment=write why softmax is used]{softmax} function can be sensitive to very large input values. These kill the gradient, slow down learning, or cause it to stop altogether. Since the average value of the dot product increases with embedding dimension, $d$.
+\begin{equation}
+\label{eqn:qkv-attn-weight-calc}
+\begin{split}
+    a^\prime(i, j) &= \frac{\symbfit{q}_i^\top \symbfit{k}_j}{\sqrt{d}}\\
+    % a_{i j}& =\frac{\exp a_{i j}^{\prime}}{\sum_{j} \exp a_{i j}^{\prime}}
+    a(i, j) &= \operatorname{softmax}\left( a^\prime(i, j) \right)\\
+\end{split}
+\end{equation}
+
+\begin{tcolorbox}[title=Why $\sqrt{d}$?]
+Consider a vector in $\mathbb{R}^d$ with values all $c$. Its Euclidean length is $\sqrt{d}c$. Therefore, we are dividing out the amount by which the increase in dimension increases the length of the average vectors.
+\end{tcolorbox}
+
+We then use the attention weights calculated in \Cref{eqn:qkv-attn-weight-calc}, to compute a weight sum to generate the output vector. Note that the output vector $\symbfit{z}_i$ depends on $\symbf{v}_j \forall j$ however not every $\symbfit{v}_j$ contributes equally to output $\symbfit{z}_i$. The contribution to the output is controlled by the attention weight $a(i, j)$.
+\begin{equation}
+    \label{eqn:qkv-attn-aggregation}
+    \symbfit{z}_{i}=\sum_{j} a(i, j) \symbfit{v}_{j}
+\end{equation}
+
+As stated earlier in \Cref{sec:janossy-pooling,sec:graph-nn}, self-attention is a special case of graph neural networks. We can see this from \Cref{eqn:qkv-attn-aggregation,eqn:attn-gnn,eqn:janossy-attention}. We can view this from the message-passing perspective presented in \Cref{sec:graph-nn} to realise that every output is determined by all its neighbours, it is this structure that $\samptr$ succesfully makes use of in order to \textquote{look} beyond single instances and refine features.

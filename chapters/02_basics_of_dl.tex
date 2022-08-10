@@ -121,6 +121,7 @@ Both of these issues make the problem difficult to solve in addition to making t
 One way to accomplish these goals (ensuring that the output sums up to $1$ and its values are non-negative), is to use an exponential function $P(y = i) \propto \exp o_i$. The $\exp$ function does ensure that the output will always be non-negative. We can further \textbf{normalise} these values so that they add up to $1$ by dividing each by the sum of the whole. This gives us the \textbf{softmax} function:
 \begin{equation}
     \hat{\symbfit{y}} = \operatorname{softmax}(\symbfit{o}) \quad \text{where}\quad \hat{y}_i = \frac{\exp(o_i)}{\sum_{j=1}^{K} \exp(o_j)}.
+    \label{eqn:std-softmax}
 \end{equation}
 
 Note that the highest value in $\symbfit{o}$ corresponds to the most likely class according to $\symbfit{\hat{y}}$. Softmax also preserves the ordering of its arguments as shown in the example:
