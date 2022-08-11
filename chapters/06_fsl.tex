@@ -7,3 +7,13 @@ Second, people learn far richer representations than machines do, even for seemi
 In contrast to this, the best machine learning models and neural networks cannot perform these additional functions using their specialised learnt representations. 
 The challenge arises when we wish for AI models to learn new concepts and representations from few examples and ensure that these representations are abstract and flexible.
 
+\section{Formalising the Few-Shot Learning Problem}\label{sec:formalising-fsl}
+
+In a few-shot setting, the model aims to generalise well and quickly enough on a variety of new and potentially unseen tasks after being trained for optimal performance on various learning tasks.
+Each task is associated with a dataset $\mathcal{D}$, containing both inputs and true labels. 
+The model parameters of an optimal generalisable model are defined as follows:
+\begin{equation}
+    \symbfit{\theta}^\star = \arg\min_{\symbfit \theta} \mathbb{E}_{\mathcal{D}\sim p(\mathcal{D})} [\mathcal{L}_\theta(\mathcal{D})]
+\end{equation}
+
+%Let us denote the training data of size $D$ as $\mathcal{D}_{\textup{tr}} = \{({\bm x}_i, y_i)\}_{i = 1}^{D}$ with $({\bm x}_i, y_i)$ representing an image and its class label, respectively. In the pre-training phase, we take $L$ random samples from $\mathcal{D}_{\textup{tr}}$ and augment each sample $A$ times by randomly sampling augmentation functions $\zeta^a(.), \forall a \in [A]$ from the set $\mathcal{A}$. This results in a mini-batch of size $B = (A + 1)L$ total samples. Note that in the unsupervised setting we have no access to the data labels in the pre-training phase. Next, we fine-tune our model episodically \cite{Vinyals2016MatchingLearning} on a set of randomly sampled tasks $\mathcal{T}_i$ drawn from the test dataset $\mathcal{D}_{\textup{tst}} = \{({\bm x}_i, y_i)\}_{i = 1}^{D^\prime}$ of size $D^\prime$. The tasks $\mathcal{T}_i$ are constructed by drawing $K$ labeled and $Q$ unlabeled random samples from $N$ different classes, which is called an ($N$-way, $K$-shot) task, and denoted by $(N, K)$. The $NK$ labeled samples make up the support set $\mathcal{S}$, from which the model learns, and the other $NQ$ unlabeled samples make up the query set $\mathcal{Q}$, on which the model is evaluated
