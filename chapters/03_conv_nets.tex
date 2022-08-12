@@ -19,7 +19,6 @@
     \label{fig:cnn-overview}
 \end{figure}
 \footnotetext{\url{https://www.mathworks.com/discovery/convolutional-neural-network-matlab.html}}
-
 \citeauthor{LeCun1989} proposed the novel \textbf{convolutional neural network} (CNN) architecture to tackle computer vision tasks. The specific task \citeauthor{LeCun1989} chose to solve was the recognition of handwritten digits (today a similar dataset is the MNIST\footnote{\url{http://yann.lecun.com/exdb/mnist/}} dataset). 
 
 
@@ -129,6 +128,7 @@ This process can be repeated using different kernels to generate as many \textbf
         map. The same is repeated for the middle and right pathways to form the
         second and third feature maps, and all three output feature maps are
         grouped together to form the output. Figure courtesy \textcite{Dumoulin2016}.}
+    \vspace{-0.5cm}
 \end{figure}
 
 
@@ -139,10 +139,8 @@ In addition to convolution operation described in \cref{sec:convolutions}, \text
 Pooling operations work similarly to a convolution by sliding a window across the input and applying a pooling function to the contents of the window. 
 Pooling operations replace the linear combination described by the kernel with some other function. \Cref{fig:numerical_average_pooling} shows an example of the \textbf{average pooling} operation, which applies the averaging function on the contents of the sliding window. Similarly, \textbf{maximum pooling} is another pooling operation that takes the maximum of the content present in the sliding window.
 
-
-\newpage
 \section{Kernels as Feature Extractors}\label{sec:kernel-feature-extractor}
-Each convolutional layer is characterised by the size of the kernels, the number of kernels, the padding and \textbf{stride}; the relationship between these components is not trivial to intuitively infer. Every kernel's weights act as a particular feature detector, and thus learning the kernel's weights translates into learning the features. \Cref{fig:feature-viz} shows the types of features and patterns learnt by a fully trained model in various layers. Note that as the number of layers increases, the network is learning more and more specific and complex patterns.
+Each convolutional layer is characterised by the size of the kernels, the number of kernels, the padding and \textbf{stride}; the relationship between these components is not trivial to intuitively infer. Every kernel's weights act as a particular feature detector, and thus learning the kernel's weights translates into learning the features. \Cref{fig:feature-viz} shows the types of features and patterns learnt by a fully trained model in various layers. Note that as the number of layers increases, the network is learning more specific and complex patterns.
 
 \begin{figure}[ht]
     \centering
