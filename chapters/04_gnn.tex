@@ -56,7 +56,7 @@ This idea is called \textbf{Janossy pooling} and was first introduced by \textci
 
 \subsection{A More Efficient Janossy Pooling}\label{ssec:efficient-janossy}
 
-To save computational costs, we may give up the calculation of $n!$ permutations. In the above (\Cref{fig:basic-perm-invar}), we look at all possible $n$-tuples from the set of $n$ elements; instead, we can consider all $k$-tuples where $k \less n$ \parencite{Murphy2018}. We can then update \cref{eqn:perm-invar-avg} as:
+To save computational costs, we may give up the calculation of $n!$ permutations. In the above \Cref{fig:basic-perm-invar}, we look at all possible $n$-tuples from the set of $n$ elements; instead, we can consider all $k$-tuples where $k \less n$ \parencite{Murphy2018}. We can then update \cref{eqn:perm-invar-avg} as:
 \begin{equation}
     \label{eqn:k-tup-janossy}
     \widehat{f}(\symbf{X}) = \frac{1}{|P(n, k)|} \sum_{\symbf{X}_{\{k\}}} f(\symbf{X}_{\{k\}})
@@ -132,7 +132,7 @@ and a node-wise function $\rho$ is permutation equivariant if
 \subsection{Modelling Relations and Interactions}\label{ssec:relation-and-interactions}
 
 \samptr\ has yet another fundamental idea that is essential for its success and operation. 
-It is able to exploit the interactions (or relations) between elements in a set (mini-batch, which really means that we are trying to capture the fact that our model output may depend not only on the individual contribution of each element, but it may be crucial to also take into account the fact that certain elements appear together in the same set. Our goal is simply to model and use these interactions.
+It is able to exploit the interactions (or relations) between elements in a set (mini-batch), which really means that we are trying to capture the fact that our model output may depend not only on the individual contribution of each element, but it may be crucial to also take into account the fact that certain elements appear together in the same set. Our goal is simply to model and use these interactions.
 
 To illustrate this with a simple example, imagine the task of evaluating how well a set of ingredients work together to cook a meal. Setting $k=1$ allows the function $\phi$ to consider related individual attributes, but it cannot detect conflicts between ingredients (e.g., garlic vs. vanilla). Larger $k$ allows $\phi$ to see more than one item at a time, allowing it to make relational inferences about pairs of ingredients, allowing for a more expressive model of deliciousness. Considering $\phi$ as an encoder and $\rho$ as a decoder, $\phi$ can encode information about interactions, which $\rho$ can use for decoding.
 
@@ -143,7 +143,7 @@ Similar to the above example, $\samptr$ uses \highlight[comment=cite/ref here]{c
 
 Many of the current neural architectures resemble Janossy pooling with $k=2$.
 \textbf{Self-attention} \parencite{vaswani2017attention} is one such algorithm that is also used in the context of graphs in \samptr. Self-attention works by comparing two elements of a set at a time, usually by performing a scalar product.
-The results of the scalar products are used as \textbf{attention weights} to aggregate information from different points using a weighted permutation invariant sum. Although it is similar to binary Janossy pooling, self-attention also uses $\operatorname{softmax}$ to ensure that attention weights sum up to $1$ (see \Cref{sec:softmax}).
+The results of the scalar products are used as \textbf{attention weights} to aggregate information from different points using a weighted permutation invariant sum. Although it is similar to binary ($k=2$) Janossy pooling, self-attention also uses $\operatorname{softmax}$ to ensure that attention weights sum up to $1$ (see \Cref{sec:softmax}).
 
 To substantiate the relationship between permutation-invariant binary Janossy pooling and self-attention, we first define a natural extension of $k$-ary Janossy pooling from permutation \textit{invariance to equivariance}. In normal binary Janossy pooling, the function $\phi$ acts on every two-tuple, followed by the $\operatorname{sum}$-pooling operation. For the purpose of visualisation and intuition, we will write these two-tuples as a matrix:
 \begin{equation}
@@ -163,7 +163,7 @@ In general, we define $k$-ary equivariant Janossy pooling as follows: the $i\tex
     \label{eqn:janossy-attention}
 \end{equation}
 
-In practise, however, the process is slightly more involved. Typically, $\phi(\bfitx_i, \bfitx_j)$ is divided into \textbf{attention weights} $w(\bfitx_i, \bfitx_j)$ and \textbf{values} $v(\bfitx_j)$ and a softmax is applied on the attention weights. Furthermore, the attention weights themselves would be born from the scaled dot-product between two affine transformations called the \textbf{query} and \textbf{key}.
+In practise, however, the process is slightly more involved. Typically, $\phi(\bfitx_i, \bfitx_j)$ is divided into \textbf{attention weights} $a(\bfitx_i, \bfitx_j)$ and \textbf{values} $v(\bfitx_j)$ and a softmax is applied on the attention weights. Furthermore, the attention weights themselves would be born from the scaled dot-product between two affine transformations called the \textbf{query} and \textbf{key}.
 However, the elegant view from the lens of binary Janossy pooling remains clear. We shall come back to self-attention and its usage in $\samptr$ in later sections.
 
 \section{Graph Neural Networks}\label{sec:graph-nn}
@@ -220,14 +220,14 @@ Based on our discussion in \Cref{ssec:deep-sets}, we consider a graph to be spec
 
 There are three types of GNN layers that are most common, in all three of them permutation invariance is satisfied by \textbf{aggregating} features from $\symbf{X}_{\mathcal{N}_i}$ (potentially transformed by another function $\psi$) with some permutation-invariant function $\bigoplus$, and then \textbf{updating} the features of node $i$, by means of some function $\varphi$. Usually, $\varphi$ and $\psi$ are learnable affine transformations with activation functions (see \Cref{chap:basics-of-dl}) and $\bigoplus$ is an operation such as $\operatorname{sum}$, $\operatorname{mean}$, or $\operatorname{max}$. These operations are analogous to pooling functions discussed in \Cref{sec:conv-pooling}.
 
-In the \textbf{convolutional} kind of GNNs \parencite{kipf2016semi}, the features of the neighbourhood nodes are directly aggregate with fixed weights,
+In the \textbf{convolutional} kind of GNNs \parencite{kipf2016semi}, the features of the neighbourhood nodes are directly aggregated with fixed weights,
 \begin{equation}
     z_{u}=\varphi\left(\bfitx_{i}, \bigoplus_{j \in \mathcal{N}_{i}} c_{i j} \psi\left(\bfitx_{j}\right)\right).
     \label{eqn:gcn}
 \end{equation}
 Here, $c_{ij}$ specifies the importance of node $i$ to node $j$'s representation.
 
-In the attentional scheme \parencite{velic018graph, brody2021attentive}, the interactions are implicit
+In the \textbf{attentional} scheme \parencite{velic018graph, brody2021attentive}, the interactions are implicit
 \begin{equation}
 z_{i}=\varphi\left(\bfitx_{u}, \bigoplus_{j \in \mathcal{N}_{i}} a\left(\bfitx_{i}, \bfitx_{j}\right) \psi\left(\bfitx_{j}\right)\right)
 \label{eqn:attn-gnn}
@@ -245,7 +245,7 @@ It must be noted that the relationship between the three approaches is as follow
 
 \section{Self-Attention}\label{sec:self-attention}
 
-We shall close out the discussion on geometric deep learning and GNNs by following up on \Cref{sec:janossy-pooling} and going into a bit more detail about how self-attention. While our geometric deep learning based perspective is still valid, there are several details that affect the implementation, although the form of self-attention remains the same as we have discussed in earlier sections.
+We shall close out the discussion on geometric deep learning and GNNs by following up on \Cref{sec:janossy-pooling} and going into a bit more detail about how self-attention is implemented. While our geometric deep learning based perspective is still valid, there are several details that affect the implementation, although the form of self-attention remains the same as we have discussed in earlier sections.
 
 \subsection{Query, Key and Value}\label{sec:attn-qkv}
 We have already alluded to queries, keys and values in \Cref{eqn:janossy-attention}, these three entities form the major components of self-attention. These entities are also what makes self-attention based GNNs more expressive than the standard attention scheme (\Cref{eqn:attn-gnn}) \parencite{brody2021attentive, Bronstein2021, Dwivedi2020}.
@@ -263,7 +263,7 @@ These roles are called \textbf{query}, \textbf{key}, and \textbf{value}, respect
 \end{equation}
 these transformations allow the attention module a fair degree of flexibility, allowing it to project the input to suit the roles they must be a part of. 
 
-The \highlight[comment=write why softmax is used]{softmax} function can be sensitive to very large input values. These kill the gradient, slow down learning, or cause it to stop altogether. Since the average value of the dot product increases with embedding dimension, $d$.
+The \highlight[comment=write why softmax is used]{softmax} function can be sensitive to very large input values. These kill the gradient, slow down learning, or cause it to stop altogether. Since the average value of the dot product increases with embedding dimension $d$, it helps to scale the dot product back a little to prevent the inputs to the softmax function from growing too large.
 \begin{equation}
 \label{eqn:qkv-attn-weight-calc}
 \begin{split}
