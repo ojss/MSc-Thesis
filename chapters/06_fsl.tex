@@ -23,8 +23,11 @@ The model parameters of an optimal generalisable model are defined as follows:
 
 First, we look at how \(\mathcal{D}\) is structured in a standard supervised few-shot setting. 
 Consider a labelled dataset of size $M$, $\mathcal{D} = \left\{(\symbfit{x}_i, y_i)\, |\, i \in [1,M] \right\}$ of images $\symbfit{x}_i$ and class labels $y_i$. 
-This dataset $\mathcal{D}$ is divided into three disjoint subsets: $\left\{\mathcal{D}^\textup{tr}\, \cup\, \mathcal{D}^\textup{val}\, \cup\, \mathcal{D}^\textup{test}\right\} \in \mathcal{D}$, respectively, referring to the training, validation, and test subsets. The validation dataset $\mathcal{D}^\textup{val}$ is used for model selection and the testing dataset $\mathcal{D}^\textup{test}$ for final evaluation. The episodic training is done on a set of tasks $\mathcal{T}_i \sim p(\mathcal{T})$. The tasks are constructed by drawing $K$ random samples from $N$ different classes, which we denote as an ($N$-way, $K$-shot) task. 
-Specifically, each task $\mathcal{T}_i$ is made up of a set $\textit{support}$ and a $\textit{query}$ set and each task may also be referred to as an \textquote{episode}. The support set $\mathcal{S}$ contains $K$ samples per class and the query set $\mathcal{Q}$ contains $Q$ samples per class. For a given task, the $NK$ support and $NQ$ query images are mutually exclusive to evaluate the generalisation performance of the model.
+This dataset $\mathcal{D}$ is divided into three disjoint subsets: $\left\{\mathcal{D}^\textup{tr}\, \cup\, \mathcal{D}^\textup{val}\, \cup\, \mathcal{D}^\textup{test}\right\} \in \mathcal{D}$, respectively, referring to the training, validation, and test subsets. The validation dataset $\mathcal{D}^\textup{val}$ is used for model selection and the testing dataset $\mathcal{D}^\textup{test}$ for final evaluation. The episodic training is carried out on a set of tasks $\mathcal{T}_i \sim p(\mathcal{T})$. 
+Every \textquote{task} is a self-contained learning problem, each relying on small \textquote{support} and \textquote{query} sets to mimic the few-shot circumstances encountered during evaluation.
+The tasks are constructed by drawing $K$ random samples from $N$ different classes, which we denote as an ($N$-way, $K$-shot) task. 
+Specifically, each task $\mathcal{T}_i$ is made up of a $\textit{support}$ and a $\textit{query}$ set, $\mcT_i=\langle \mcS, \mcQ \rangle$, and each task can also be referred to as an \textquote{episode}. 
+The support set $\mcS$ contains $K$ samples per class, and the query set $\mcQ$ contains $Q$ samples per class. For a given task, the $NK$ support and $NQ$ query images are mutually exclusive to evaluate the generalisation performance of the model.
 \begin{figure}[ht]
     \centering
     \captionsetup{justification=centering}
@@ -33,14 +36,14 @@ Specifically, each task $\mathcal{T}_i$ is made up of a set $\textit{support}$ a
     \label{fig:fsl-tasks}
 \end{figure}
 
-In most training routines, tasks are randomly sampled from a task distribution according to the (\nwks{N}{K}) setting, and then the model parameters are updated by backpropagation after each task.
-This comprises one episode. The model is expected to quickly learn the optimal parameters from the $NK$ support data points and apply the learnt weights to classify the $NQ$ unlabelled query data points, on which the performance is evaluated.
-\Cref{fig:fsl-tasks} shows (\nwks{2}{4}) training tasks, it must be noted that even during testing (downstream classification task) the model is presented with tasks that are in the same (\nwks{2}{4}) form as the training tasks.
+In most training routines, tasks are randomly sampled from a task distribution according to the (\nwks{N}{K}) setting, and then the model parameters are updated by back-propagation after each task.
+This comprises one episode. The model is expected to quickly learn the optimal parameters from the $NK$ support data points and apply the learnt weights to classify the $NQ$ unlabelled query data points, on which performance is evaluated.
+\Cref{fig:fsl-tasks} shows (\nwks{2}{4}) training tasks, it should be noted that even during testing (downstream classification task) the model is presented with tasks that are in the same (\nwks{2}{4}) form as the training tasks.
 
 \section{Model Agnostic Meta Learning (MAML)}\label{sec:maml}
-\textbf{Meta-learning} is most commonly understood as learning to learn, which refers to the process of improving a learning algorithm over multiple learning episodes and was first proposed by \textcite{schmidhuber:1987:srl}. In contrast, conventional ML improves model predictions over multiple data instances. 
-During base learning, an \emph{inner} learning algorithm solves a task such as image classification, defined by a dataset and objective. During meta-learning, an \emph{outer} algorithm updates the inner learning algorithm such that the model it learns improves an outer objective.
-Learning episodes of the base task, namely tuples of image $\bfitx_i$ and associated label $y_i$, can be seen as providing the instances needed by the outer algorithm to learn the base learning algorithm
+\textbf{Meta-learning} is most commonly understood as learning to learn, which refers to the process of improving a learning algorithm over multiple learning episodes and was first proposed by \textcite{schmidhuber:1987:srl}. On the contrary, conventional ML improves model predictions on multiple data instances. 
+During base learning, an \emph{inner} learning algorithm solves a task such as image classification, defined by a dataset and an objective. During meta-learning, an \emph{outer} algorithm updates the inner learning algorithm so that the model it learns improves an outer objective.
+The learning episodes of the base task, namely tuples of the image $\bfitx_i$ and associated label $y_i$, can be seen to provide the instances that the outer algorithm needs to learn the base learning algorithm
 
 \begin{wrapfigure}{r}{0.25\linewidth}
     \centering
@@ -48,18 +51,18 @@ Learning episodes of the base task, namely tuples of image $\bfitx_i$ and associ
     \caption{MAML tries to find optimal generalised weights, by first finding optimal weights in the inner learning phase.}
     \label{fig:maml}
 \end{wrapfigure}
-MAML is a gradient based \textbf{meta learning} method. It is a technique that works with any model which learns through gradient descent. It trains a model to find an optimal set of weights that can be quickly adapted to a new task, through a few gradient descent steps. The meta-learner tries to find an initial set of weights that are not only useful for adapting to various problems, but also can be adapted quickly (in a small number of steps) and efficiently (using only a few examples).
+MAML is a gradient-based \textbf{meta learning} method. It is a technique that works with any model that learns through gradient descent. It trains a model to find an optimal set of weights that can be quickly adapted to a new task, through a few gradient descent steps. The meta-learner tries to find an initial set of weights that are not only useful for adapting to various problems, but also can be adapted quickly (in a small number of steps) and efficiently (using only a few examples).
 
-In \Cref{fig:maml} we are trying to find a set of parameters $\theta$ that can be easily adapted. MAML optimises for a set of parameters so that when a gradient step is taken with respect to a particular task $\mcT_i $ (the grey lines), the parameters are close to the optimal parameters $\theta^*_i$ for task $\mcT_i$.
+In \Cref{fig:maml} we try to find a set of parameters $\theta$ that can be easily adapted. MAML optimises for a set of parameters so that when a gradient step is taken with respect to a particular task $\mcT_i $ (the grey lines), the parameters are close to the optimal parameters $\theta^*_i$ for task $\mcT_i$.
 
 This approach is fairly simple and has several advantages. It does not make any assumptions about the form of the model. It is quite efficient - no additional parameters are introduced for meta-learning, and the learner strategy uses a known optimisation process (gradient descent), rather than having to come up with one from scratch. It can also be easily applied to a number of domains, including classification, regression, and reinforcement learning. However, it can be computationally expensive due to the use of higher-order gradients, as we will see.
 
-Given a task and its associated support and query sets $\langle S, Q \rangle$, we can update the model parameters by one or more gradient descent steps (the following example only contains one step):
+Given a task and its associated support and query sets $\langle \mcS, \mcQ \rangle$, we can update the model parameters by one or more gradient descent steps (the following example contains only one step):
 \begin{equation}
     \theta^\prime_i = \theta - \eta \nabla_\theta\mathcal{L}^{(0)}_{\mcT_i}(f_\theta)
     \label{eqn:one-task-maml}
 \end{equation}
-where $\mathcal{L}^{(0)}$ is the loss computed using the task with id $(0)$.
+where $\mathcal{L}^{(0)}$ is the loss calculated using the task with id $(0)$.
 
 \begin{equation}
     \begin{aligned}
@@ -70,17 +73,18 @@ where $\mathcal{L}^{(0)}$ is the loss computed using the task with id $(0)$.
     \label{eqn:maml-update-rule}
 \end{equation}
 
-The update rule in \Cref{eqn:one-task-maml} only optimises for one task. To achieve a good generalisation on a variety of tasks, we would like to find the optimal $\theta^\star$ so that the task-specific fine-tuning is more efficient.
+The update rule in \Cref{eqn:one-task-maml} optimises only for one task. To achieve a good generalisation on a variety of tasks, we would like to find the optimal $\theta^\star$ so that task-specific fine-tuning is more efficient.
 Now, we sample a new task with id $(1)$ to update the outer objective (also called the meta-objective).
-For the outer objective we use the meta update rule given in \Cref{eqn:maml-update-rule}, the task specific parameters are used to calculate the loss on a query set, based on this loss the meta update is applied. The meta update is essentially unrolling the task-specific optimisation and backpropagating through the optimisation process.The loss, denoted as $\mathcal{L}^{(1)}$, depends on the task $(1)$. The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different tasks and refer to the same loss objective for the same task.
+For the outer objective, we use the meta-update rule given in \Cref{eqn:maml-update-rule}, the task-specific parameters are used to calculate the loss on a query set, and based on this loss, the meta-update is applied. The meta-update is essentially a roll-out of task-specific optimisation and back-propagation through the optimisation process.
+The loss, denoted as $\mathcal{L}^{(1)}$, depends on the task $(1)$. The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different tasks and refer to the same loss objective for the same task.
 For more details, please refer to \parencite{Finn2017Model-agnosticNetworks}.
 
 
 \section{Prototypical Networks}\label{ssec:protonets}
 
-Prototypical networks are a type of\textbf{metric learning} models. The core idea in metric learning is similar to nearest neighbours algorithms ($k$-NN classifier and $k$-means clustering) and kernel density estimation. The goal of Metric Learning is to learn a representation function that maps objects into an embedded space. The distance in the embedded space should preserve the objects' similarity; similar objects get closer, and dissimilar objects get far away. The similarity metric is learnt by a kernel function $\mathscr{k}_{\symbfit{\theta}}$, parameterised by $\symbfit{\theta}$. The distances measured by the kernel function are converted into probabilities on a set of labels $y_i \forall i$ by means of a softmax or sigmoid function. Both $\ccclr$ and $\samptr$ make use of prototypical networks for classification because this method is simple yet robust as evidenced by the performance of $\ccclr$ and $\samptr$.
+Prototypical networks are a type of \textbf{metric learning} models. The core idea in metric learning is similar to nearest neighbours algorithms ($k$-NN classifier and $k$-means clustering) and kernel density estimation. The goal of Metric Learning is to learn a representation function that maps objects into an embedded space. The distance in the embedded space should preserve the objects' similarity; similar objects get closer, and dissimilar objects get far away. The similarity metric is learnt by a kernel function $f_{\symbfit{\theta}}$, parameterised by $\symbfit{\theta}$. The distances measured by the kernel function are converted into probabilities on a set of labels $y_i \forall i$ by means of a softmax or sigmoid function. Both $\ccclr$ and $\samptr$ make use of prototypical networks for classification because this method is simple, yet robust, as evidenced by the performance of $\ccclr$ and $\samptr$.
 
-Prototypical networks learn a non-linear function, $f_{\symbfit \theta}$, that maps the input to a feature vector in an embedding space (or representation space) using a parameterised neural network in a supervised manner. The embeddings of the $K$-shots for each of the $N$-classes are averaged in order to compute the \textbf{class prototypes}. Traditionally, a \textit{prototype} is an entity that is the archetypal form of \textquote{something}, for example, Boeing $777$\footnote{\url{https://www.boeing.com/commercial/777/}} jets are prototypes of modern large passenger jets.
+Prototypical networks learn a non-linear function, $f_{\symbfit \theta}$, that maps the input to a feature vector in an embedding space (or representation space) using a parameterised neural network in a supervised manner. The embeddings of the $K$-shots for each of the $N$-classes are averaged to compute the \textbf{class prototypes}. Traditionally, a \textit{prototype} is an entity that is the archetypal form of \textquote{something}, for example, Boeing $777$\footnote{\url{https://www.boeing.com/commercial/777/}} jets are prototypes of modern large passenger jets.
 Here, a class prototype $\symbfit{c}_k$ plays a similar role; it is a feature vector that is defined for every class $k \in \mathcal{C}$, as the mean vector of the embedded support set samples in class $k$, and is calculated as:
 \begin{equation}
     \symbfit{c}_{k}=\frac{1}{|\mcS_{k}|} \sum_{({\symbfit x}_i, y_i) \in {\mcS_k}} f_{\symbfit \theta}(\symbfit{x}_{i}).
@@ -99,19 +103,32 @@ The distribution over classes for a given query input $\symbfit{x}$ is a softmax
     P(y=k\vert\symbfit{x})=\operatorname{softmax}\left(-d(f_\theta(\symbfit{x}), \symbfit{c}_k)\right) = \frac{\exp(-d(f_\theta(\symbfit{x}), \symbfit{c}_k))}{\sum_{k^\prime \in \mathcal{C}}\exp(-d(f_\theta(\symbfit{x}), \symbfit{c}_{k^\prime}))}
     \label{eqn:fsl-proto-classification}
 \end{equation}
-where $d$ can be any distance function as long as it is a differentiable operation to allow for gradient-based learning. In the original work, \textcite{Snell2017PrototypicalLearning} use the Euclidean distance metric.
+where $d$ can be any distance function, as long as it is a differentiable operation to allow gradient-based learning. In the original work, \textcite{Snell2017PrototypicalLearning} use the Euclidean distance metric.
 
 Learning is carried out by minimising the negative log likelihood $J(\symbfit{\theta})$ and performing stochastic gradient descent over the same to update the kernel's parameters $\symbfit{\theta}$:
 \begin{equation}
     J(\theta)=-\log P_{\symbfit \theta}(y=k \vert \symbfit{x}).
 \end{equation}
 
+\subsection{Reinterpretation of the Prototypical Classifier as a Linear Model}\label{ssec:proto-reint-linmodel}
+
+As explained by \textcite{Snell2017PrototypicalLearning}, Prototypical Networks can be re-interpreted as a linear classifier applied to a learned representation $f_{\symbfit{\theta}}(\bfitx)$. Using the Euclidean distance \(d(\symbfit{z}_i, \symbfit{z}_j)=\left\|\symbfit{z}_i-\symbfit{z}_j\right\|^{2}\) in \Cref{eqn:fsl-proto-classification} makes the model equivalent to a linear model and the output logits can be expressed as:
+\begin{align}
+        -\left\|f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}\right\|^{2}&=-f_{\symbfit \theta}(\symbfit{x})^{\top} f_{\symbfit \theta}(\symbfit{x})+2 \symbfit{c}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}\\
+        2 \symbfit{c}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}&=\symbf{W}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})+b_{k} \text {, where } \symbf{W}_{k}=2 \symbfit{c}_{k} \text { and } b_{k}=-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}
+        \label{eqn:proto-lin-layer}
+\end{align}
+
+Based on \Cref{eqn:proto-lin-layer}, we can see that the $k\textsuperscript{th}$ unit of an equivalent linear layer therefore has weights \(\symbf{W}_k=2\symbfit{c}_k\) and biases $b_k=-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}=-\left\| \symbfit{c}_k \right\|^2$, which are both differentiable with respect to $\symbfit{\theta}$ as they are a function of $f_{\symbfit \theta}$. \textcite{Snell2017PrototypicalLearning} hypothesise that this linear classifier is effective because all the required non-linearity can be learnt within the embedding function $f_{\symbfit \theta}$.
+
+This interpretation also allows us to create a task-specific linear classifier layer for each episode where the layer weights are initialised based on the equivalent weights and biases of the prototypical network as defined above and in \Cref{eqn:proto-lin-layer}. Subsequently, this layer can then be optimised as usual on the given support set. When computing the update for $\symbfit{\theta}$, we allow gradients to flow through the Prototypical Network-equivalent linear layer; we may also \textbf{freeze} the embedding network $f_{\symbfit \theta}$ if we only wish to train the Prototypical Network-equivalent linear layer.
+
 
 \section{Unsupervised Few-Shot Learning}\label{sec:u-fsl}
 
-So far, we have only discussed few-shot learning in a supervised setting. However, a more challenging scenario is the unsupervised setting. Recall that the dataset in the supervised setting is given as \(\mathcal{D} = \left\{(\symbfit{x}_i, y_i)\, |\, i \in [1,M]\right\}\) which implies that we have the true class labels $y_i$ available to us during training time. In the unsupervised setting we no longer have access to the true labels during the training period. 
+So far, we have only discussed few-shot learning in a supervised setting. However, a more challenging scenario is the unsupervised setting. Recall that the dataset in the supervised setting is given as \(\mathcal{D} = \left\{(\symbfit{x}_i, y_i)\, |\, i \in [1,M]\right\}\) which implies that we have the true class labels $y_i$ available during training time. In the unsupervised setting, we no longer have access to the true labels during the training period. 
 
-Then a question naturally arises: How do we create valid tasks (see \Cref{sec:formalising-fsl}) if we do not have access to the true labels? This is an important question, consider \Cref{fig:fsl-tasks} where we illustrate (\nwks{2}{4}) shots, we see that each of the $2$ classes have exactly $4$ samples. Tasks like this would be taxing to create without labels. To overcome this, there are a few creative methods that we shall discuss in the following sections.
+Then a question naturally arises: How do we create valid tasks (see \Cref{sec:formalising-fsl}) if we do not have access to the true labels? This is an important question; consider \Cref{fig:fsl-tasks} where we illustrate (\nwks{2}{4}) shots, we see that each of the $2$ classes has exactly $4$ samples. Tasks like this would be difficult to create without labels. To overcome this, we shall discuss some creative methods in the following sections.
 
 \subsection{CACTUs}\label{ssec:ufsl-cactus}
 CACTUs was one of the first methods aimed at solving the unsupervised few-shot learning problem \parencite{Hsu2018UnsupervisedMeta-Learning}. CACTUs uses MAML as part of its training mechanism to obtain a generalisable model. CACTUS also retains the episodic task-based training strategy introduced by MAML \parencite{Finn2017Model-agnosticNetworks}. Unlike MAML, however, a major aspect of CACTUs is dedicated to a clever \textbf{task creation} technique, as it cannot be fed standard tasks, as discussed above.
@@ -121,17 +138,17 @@ CACTUs was one of the first methods aimed at solving the unsupervised few-shot l
     \caption{Illustration of CACTUs. }
     \label{fig:cactus}
 \end{figure}
-The idea of CACTUs is to use a separate embedding learning algorithm $\mathcal{E}$ on $\bfitx_i \in \mathcal{D}$ to produce embeddings $\{\symbfit{z}_i\}$. CACTUs then uses $k$-means clustering on $\{\symbfit{z}_i\}$ $P$ times in order to generate a set of partitions $\mathcal{P}_P = \{\mathcal{C}_P\}$. CACTUs can technically make use of any self-supervised (more generally, unsupervised) representation learning methods to train $\mathcal{E}$. \textcite{Hsu2018UnsupervisedMeta-Learning} choose to use DeepCluster \parencite{caron2018deep}, BiGAN \parencite{berthelot2018understanding}, ACAI \parencite{donahue2016adversarial}, and InfoGAN \parencite{chen2016infogan}. 
+The idea of CACTUs is to use a separate embedding learning algorithm $\mathcal{E}$ on $\bfitx_i \in \mathcal{D}$ to produce embeddings $\{\symbfit{z}_i\}$. CACTUs then uses $k$-means clustering on $\{\symbfit{z}_i\}$ $P$ times to generate a set of partitions $\mathcal{P}_P = \{\mathcal{C}_P\}$. CACTUs can technically make use of any self-supervised (more generally, unsupervised) representation learning methods to train $\mathcal{E}$. \textcite{Hsu2018UnsupervisedMeta-Learning} choose to use DeepCluster \parencite{caron2018deep}, BiGAN \parencite{berthelot2018understanding}, ACAI \parencite{donahue2016adversarial}, and InfoGAN \parencite{chen2016infogan}. 
 
 CACTUs then samples a partition $\mathcal{P}$ randomly from the set of parititons $\{\mathcal{P}_P\}$, following which a cluster $\mathcal{C}_n$ is randomly sampled from the partition $\mathcal{P}$. The cluster sampling process is carried out $N$ times for each of the classes desired in a (\nwks{N}{K}) task. Similarly, the process is repeated for $Q$ query images. Finally, the randomly sampled support and query images are used to create a \textbf{synthetic} task that is fed into MAML.
 
-A major concern here is that CACTUs is dependent on bigger models, like AlexNet \parencite{AlexNet2012}, using powerful self-supervised learning methods on a small dataset like \miniImagenet{}. The embeddings (representations) generated by this larger model are then used to create synthetic tasks to train a more simpler Conv$4$ architecture. It has been known for quite some time that larger models consistently offer better performance and representations \parencite{Dosovitskiy2020, He2015}, these better representations indirectly aid a smaller Conv$4$ to learn better.
+A major concern here is that CACTUs is dependent on bigger models, like AlexNet \parencite{AlexNet2012}, using powerful self-supervised learning methods on a small dataset like \miniImagenet{}. The embeddings (representations) generated by this larger model are then used to create synthetic tasks to train a simpler Conv$4$ architecture. It has been known for quite some time that larger models consistently offer better performance and representations \parencite{Dosovitskiy2020, He2015}, these better representations indirectly aid a smaller Conv$4$ to learn better.
 
 \subsection{UMTRA} \label{ssec:umtra}
 
 Unsupervised Meta-learning with Tasks constructed by Random sampling and Augmentation (UMTRA), is another method that uses a MAML style training strategy with inner and outer objectives in an unsupervised fashion.
-Unlike CACTUs (\Cref{ssec:ufsl-cactus}), the focus of UMTRA is not placed in generating ideal tasks. 
-Instead the idea behind UMTRA can be summed up in one line; it is an unsupervised method that uses augmentations of the images in a given task. This allows it to generate \textquote{supervised} validation tasks for the outer objective and can perform well if the we span the entire space of the classes.
+Unlike CACTUs (\Cref{ssec:ufsl-cactus}), the focus of UMTRA is not on generating ideal tasks. 
+Instead, the idea behind UMTRA can be summarised in one line; it is an unsupervised method that uses augmentations of the images in a given task. This allows it to generate \textquote{supervised} validation tasks for the outer objective and can perform well if we span the entire space of the classes.
 
 \begin{figure}[ht]
     \centering
@@ -140,29 +157,26 @@ Instead the idea behind UMTRA can be summed up in one line; it is an unsupervise
     \label{fig:umtra}
 \end{figure}
 
-The working of UMTRA is illustrated in \Cref{fig:umtra}, where $N$ datapoints are randomly sampled, each of the $N$ random samples are given their own unique class label. Following which, each sample $\symbfit{x}_i$ is augmented using an augmentation function $\mathcal{A}$ that gives an augmented image $\symbfit{x}_i^\prime$. 
-The reason this works is that each augmented image will share its class label with the original image. Therefore, we can be confident that the outer objective will always have samples from the same class available to it to learn from. 
+The functioning of UMTRA is illustrated in \Cref{fig:umtra}, where $N$ data points are randomly sampled, each of the $N$ random samples is given its own unique class label. Subsequently, each sample $\symbfit{x}_i$ is augmented using an augmentation function $\mathcal{A}$ that gives an augmented image $\symbfit{x}_i^\prime$. 
+The reason this works is that each augmented image will share its class label with the original image. Therefore, we can be sure that the outer objective will always have samples of the same class available for it to learn from. 
 
 \subsection{ProtoTransfer}\label{ssec:prototransfer}
 
-Up till now we have discussed about CACTUs and UMTRA, both of which use MAML and episodic training in order to solve the few-shot classification problem.
+Until now, we have discussed \nameref{ssec:ufsl-cactus} and \nameref{ssec:umtra}, both of which use \nameref{sec:maml} and episodic training to solve the few-shot classification problem.
 However, several recent studies have questioned the necessity of meta-learning for few-shot classification \parencite{goodemballneed2020, Medina2020Self-SupervisedClassification, dhillon2019baseline, ziko2020laplacian, boudiaf2020information,chen2021self}.
-They report competitive performance on few-shot benchmarks without episodic training or few-shot task-based experiences during training. These methods follow the second approach and aim to solve the few-shot learning problem by fine-tuning a pre-trained feature extractor with a standard cross-entropy loss. In fact, both our methods, \ccclr{} and \samptr{} comfortably outperform unsupervised and supervised MAML based methods.
+They report competitive performance on few-shot benchmarks without episodic training or few-shot task-based experiences during training. These methods follow the an approach where they aim to solve the few-shot learning problem by fine-tuning a pre-trained feature extractor with a standard cross-entropy loss. In fact, both our methods \ccclr{} and \samptr{} comfortably outperform unsupervised and supervised MAML based methods.
 
 Some of these methods \parencite{Medina2020Self-SupervisedClassification, goodemballneed2020, das2022confess} in the space demonstrate that the transfer learning approach outperforms meta-learning based methods in standard in-domain and cross-domain settings, where the training and novel classes come from totally different distributions.
-
-One such method we shall be focusing on is ProtoTransfer \parencite{Medina2020Self-SupervisedClassification}. Unlike, \nameref{ssec:ufsl-cactus} and \nameref{ssec:umtra} ProtoTransfer does not rely on a task-based episodic training regime and neither does it use MAML for its training. Instead, ProtoTransfer makes use of a form of \nameref{}
-
-\begin{figure}[hb]
-%\captionsetup[subfigure]{labelformat=empty}
+%
+\begin{figure}[ht]
 \centering
 \begin{minipage}{\textwidth}
   \centering
   \setlength{\unitlength}{1cm}
-  %\thicklines
+  
     \begin{picture}(13.5,5)
     \put(0,0){\includegraphics[scale=0.45]{chapters/assets/fsl/selfsupproto.pdf}}
-    %\put(-4,-1){{ $3$-simplex}}
+    
     \put(7.3,0){\includegraphics[scale=0.45]{chapters/assets/fsl/protofinetune.pdf}}
     \put(1.9,1.9){$\scriptstyle f_\theta(\symbfit{x}_i)$}
     \put(1,1.2){$\scriptstyle f_\theta(\tilde{\symbfit{x}}_{i,1})$}
@@ -172,10 +186,7 @@ One such method we shall be focusing on is ProtoTransfer \parencite{Medina2020Se
     \put(4.8,2.8){$\scriptstyle f_\theta(\symbfit{x}_{2})$}
     
     \put(3.9,.8){$\scriptstyle f_\theta(\symbfit{x}_{1})$}
-    %\put(0,0){\circle{0.1}}
-    %\put(0,5){\circle{0.1}}
-    %\put(7,0){\circle{0.1}}
-    %\put(7,5){\circle{0.1}}
+
     \put(10.5,2.9){$\scriptstyle \symbfit{c}_{1}$}
     \put(8.4,1.1){$\scriptstyle \symbfit{c}_{2}$}
     \put(11.3,1.1){$\scriptstyle \symbfit{c}_{3}$}
@@ -183,28 +194,29 @@ One such method we shall be focusing on is ProtoTransfer \parencite{Medina2020Se
     \put(9.3,1.1){$\scriptstyle f_\theta(\symbfit{q})$}
     \end{picture}\\
     \hspace{-.2cm}(a) Self-Supervised Prototypical Pre-Training \hspace{.8cm} (b) Prototypical Fine-Tuning \& Inference
-  %\caption{(a) Self-Supervised Prototypical Pre-Training \hspace{2cm} (b) Prototypical Fine-Tuning \& Inference}
+  
   \label{fig:sub2}
 \end{minipage}
-\caption{Self-Supervised Prototypical Transfer Learning. (a): In the embedding, original images $\symbfit{x}_i$ serve as class prototypes around which their $Q$ augmented views $\tilde{\symbfit{x}}_{i,q}$ should cluster. (b): Prototypes $\symbfit{c}_{n}$ are the means of embedded support examples for each class $n$ and initialize a final linear layer for fine-tuning.
-An embedded query point $\symbfit{q}$ is classified via a softmax over the fine-tuned linear layer.}
-\label{fig:algorithm}
+\caption{Self-Supervised Prototypical Transfer Learning. (a): In the embedding, original images $\symbfit{x}_i$ serve as class prototypes around which their $Q$ augmented views $\tilde{\symbfit{x}}_{i,q}$ should cluster. (b): Prototypes $\symbfit{c}_{k}$ are the means of embedded support examples for each class $n$ and initialise a final linear layer for fine-tuning.
+An embedded query point $\symbfit{q}$ is classified via a softmax over the fine-tuned linear layer.
+Image sourced from \parencite{Snell2017PrototypicalLearning}.}
+\label{fig:prototransfer}
 \end{figure}
 
+One such method that we shall focus on is ProtoTransfer \parencite{Medina2020Self-SupervisedClassification}. Unlike \nameref{ssec:ufsl-cactus} and \nameref{ssec:umtra} ProtoTransfer does not rely on a task-based episodic training regime and does not use MAML for its training. 
+Instead, ProtoTransfer uses a form of \nameref{sec:contrastive-learning} that is similar to and inspired by \nameref{ssec:simclr}. 
+ProtoTransfer consists of two phases: (i) \highlight[comment=add this to SSL section]{\textbf{pre-training}} on a large dataset of \textquote{base} classes. This is followed by (ii) \textbf{fine-tuning} on an unseen dataset consisting of \textquote{novel} classes. 
 
-% \subsection{Matching Networks}\label{ssec:matching-nets}
-% Like any network involved in a classification problem, matching networks also learn a classifier that we will call $\mathscr{v}_{\mcS}$ for any given support set $\mcS$. This classifier defines a probability distribution on the output labels $\symbfit{y}$ given a query sample $\bfitx$. Similar to prototypical networks, the classifier output is defined as a sum of support samples per class, weighted by an attention kernel $a(\bfitx, \bfitx_i)$ the value of which is proportional to the similarity between query $\bfitx$ and support sample $\bfitx_i$.
+\textcite{Medina2020Self-SupervisedClassification} call their pre-training method \textbf{ProtoCLR}, and in principle it is extremely similar to \nameref{ssec:simclr}.
+ProtoCLR uses the original image, $\bfitx_i$, and $Q$ augmentations, $\{\Tilde{\bfitx}_{i,q}\}_{q=1}^Q$. In order to learn the metric embedding function, $f_{\symbfit{\theta}}(\cdot)$, a contrastive loss is used here to ensure that all $Q$ augmentations have the same representation as the original image. 
+\nameref{ssec:simclr} on the other hand, uses two augmentations of the same image and ensures similarity between them by means of a contrastive loss. Although not the same, one can see that ProtoCLR is very inspired by methods such as \nameref{ssec:simclr}.
 
-% Matching networks differ from other metric learning approaches by the fact that they condition not only the classification strategy on the entire support set (attention kernel computed over the entire support set), but also the embedding function. \textcite{Vinyals2016MatchingLearning} argue that methods in which the cosine similarity is applied to simply compute the nearest neighbour are myopic in the sense that each element $\bfitx_i$ gets embedded by $g_\theta(\bfitx_i)$ independently of other elements in the support set $\mathcal{S}$. Thus, \textcite{Vinyals2016MatchingLearning} argue that the images in $\mathcal{S}$ should be able to modify how the test image $\bfitx$ is embedded using $f_{\symbfit \theta}$.
+\begin{tcolorbox}[title=Link between self-supervision and an episode]
+Consider a mini-batch that contains $n$ random samples $\{{\bfitx_i}\}_{i=1 \ldots n}$ from the training set $\mathcal{D}^\textup{tr}$.
+As our self-supervised setting does not assume any knowledge about the base class labels $\symbfit{y} \in \mathcal{D}^\textup{tr}$, we treat each sample as its own class. Thus, each sample $\bfitx_i$ serves as a $1$-shot support sample and class prototype. For every prototype $\bfitx_i$, $Q$ randomly augmented samples $\Tilde{\bfitx}_{i,q}$ are used as query samples.
+\end{tcolorbox}
 
-% For a more intuitive understanding, suppose that we have two inputs in the support set $x_i, x_j$ that are extremely similar.
-% When using the encoder $g_\theta(x_i, S)$, it would be helpful if the function that embeds $x_j$ would be dependent on the input $x_i$ and also change based on the output embedding of $x_i$. 
+Following the ProtoCLR pretraining phase, we have a fine-tuning phase called \textbf{ProtoTune} and it is a supervised phase. In the fine-tuning phase, the learnt embedding $f_{\symbfit{\theta}}(\cdot)$ is used to address the \textbf{target problem} of few-shot image classification, where we are presented with test tasks episodically, each with their own support and query.
+ProtoTune is based on the linear layer interpretation of the Prototypical classifier (see \Cref{ssec:proto-reint-linmodel}). It uses each task's support set to initialise the linear classifier and fine-tune it on subsets of the support set for some iterations, randomly sampling different subsets of support images in each iteration.
 
-% \begin{figure}[ht]
-%     \centering
-%     \includegraphics[width=\linewidth]{chapters/assets/fsl/matching_nets.pdf}
-%     \caption{Illustration of the working of Matching Nets. Image borrowed from \parencite{Vinyals2016MatchingLearning}.}
-%     \label{fig:maching_nets}
-% \end{figure}
-
-%Let us denote the training data of size $D$ as $\mathcal{D}_{\textup{tr}} = \{({\symbfit x}_i, y_i)\}_{i = 1}^{D}$ with $({\symbfit x}_i, y_i)$ representing an image and its class label, respectively. In the pre-training phase, we take $L$ random samples from $\mathcal{D}_{\textup{tr}}$ and augment each sample $A$ times by randomly sampling augmentation functions $\zeta^a(.), \forall a \in [A]$ from the set $\mathcal{A}$. This results in a mini-batch of size $B = (A + 1)L$ total samples. Note that in the unsupervised setting we have no access to the data labels in the pre-training phase. Next, we fine-tune our model episodically \cite{Vinyals2016MatchingLearning} on a set of randomly sampled tasks $\mathcal{T}_i$ drawn from the test dataset $\mathcal{D}_{\textup{tst}} = \{({\symbfit x}_i, y_i)\}_{i = 1}^{D^\prime}$ of size $D^\prime$. The tasks $\mathcal{T}_i$ are constructed by drawing $K$ labeled and $Q$ unlabeled random samples from $N$ different classes, which is called an ($N$-way, $K$-shot) task, and denoted by $(N, K)$. The $NK$ labeled samples make up the support set $\mathcal{S}$, from which the model learns, and the other $NQ$ unlabeled samples make up the query set $\mathcal{Q}$, on which the model is evaluated
+ProtoTransfer was chosen as the base for \ccclr{} and \samptr{} due to its robustness and simplicity of self-supervision. Although both \ccclr{} and \samptr{} are inspired by ProtoTransfer, the similarities only extend to their shared self-supervised nature and in the case of \samptr{} there is a reimagined network and fine-tuning phase based on \nameref{chap:optimal-transport} that has the potential to be useful even outside of few-shot learning.
