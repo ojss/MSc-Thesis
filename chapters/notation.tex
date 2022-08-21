@@ -1,65 +1,129 @@
-\chapter*{Notation}\label{notation}
-\addcontentsline{toc}{chapter}{Notation}
-
-
 \newcommand{\mA}{\symbfit{A}}
 \newcommand{\mB}{\symbfit{B}}
 \def\mI{\symbfit{I}}
 \def\va{{\symbfit{a}}}
 \def\ve{{\symbfit{e}}}
-
+\def\vx{{\symbfit{x}}}
+\def\vy{{\symbfit{y}}}
+\def\mJ{{\symbfit{J}}}
+\def\mH{{\symbfit{H}}}
+\def\mX{{\symbfit{X}}}
 % Random var
 \def\ra{{\textnormal{a}}}
 \def\rva{{\symbf{a}}}
 \def\rmA{\symbf{\textnormal{A}}}
 % Tensor
+
 \newcommand{\tens}[1]{\symbfit{\mathsfit{#1}}}
-\def\tA{{\symbf{A}}}
+\newcommand{\etens}[1]{\mathsfit{#1}}
+\def\tA{{\tens{A}}}
+\def\tX{{\tens{X}}}
 
-\begin{minipage}{\textwidth}
-% This is a hack to put a little title over the table
-% We cannot use "\section*", etc., they appear in the table of contents.
-% tocdepth does not work on this chapter.
-\centerline{\bf Numbers and Arrays}
-\bgroup
-% The \arraystretch definition here increases the space between rows in the table,
-% so that \displaystyle math has more vertical space.
-\def\arraystretch{1.5}
-\begin{tabular}{cp{5in}}
-$\displaystyle a$ & A scalar (integer or real)\\
-$\displaystyle \va$ & A vector\\
-$\displaystyle \mA$ & A matrix\\
-$\displaystyle \tA$ & A tensor\\
-$\displaystyle \mI_n$ & Identity matrix with $n$ rows and $n$ columns\\
-$\displaystyle \mI$ & Identity matrix with dimensionality implied by context\\
-$\displaystyle \ve^{(i)}$ & Standard basis vector $[0,\dots,0,1,0,\dots,0]$ with a 1 at position $i$\\
-$\displaystyle \text{diag}(\va)$ & A square, diagonal matrix with diagonal entries given by $\va$\\
-$\displaystyle \ra$ & A scalar random variable\\
-$\displaystyle \rva$ & A vector-valued random variable\\
-$\displaystyle \rmA$ & A matrix-valued random variable\\
-\end{tabular}
-\egroup
-\index{Scalar}
-\index{Vector}
-\index{Matrix}
-\index{Tensor}
-\end{minipage}
+\newcommand{\R}{\mathbb{R}}
+\def\sS{{\mathbb{S}}}
 
-\begin{minipage}{\textwidth}
-\centerline{\bf Linear Algebra Operations}
-\bgroup
-\def\arraystretch{1.5}
-\begin{tabular}{cp{5in}}
-\centering
-$\mA^\top$ & Transpose of matrix $\mA$ \\
-$\mA^+$ & Moore-Penrose pseudoinverse of $\mA$\\
-$\symbfit{A} \odot \symbfit{B}$ & Element-wise (Hadamard) product of $\mA$ and $\mB$ \\
+\def\eva{{a}}
+\def\emA{{A}}
+\def\erva{{\textnormal{a}}}
+\def\etA{{\etens{A}}}
+
+% Sets
+\def\sA{{\mathbb{A}}}
+\def\sB{{\mathbb{B}}}
+\def\sC{{\mathbb{C}}}
+\def\sD{{\mathbb{D}}}
+
+% Graph
+\def\gA{{\mathcal{A}}}
+\def\gB{{\mathcal{B}}}
+\def\gC{{\mathcal{C}}}
+\def\gD{{\mathcal{D}}}
+\def\gE{{\mathcal{E}}}
+\def\gF{{\mathcal{F}}}
+\def\gG{{\mathcal{G}}}
+
+
+\newcommand{\pdata}{p_{\rm{data}}}
+% The empirical distribution defined by the training set
+\newcommand{\ptrain}{\hat{p}_{\rm{data}}}
+
+
+\makenomenclature
+% \renewcommand{\nomname}{\makebox[\linewidth]{Notation}}
+\renewcommand{\nomname}{Notation}
+\renewcommand{\nomlabel}[1]{\hfil #1\hfil}
+
+%% This code creates the groups
+% -----------------------------------------
+\renewcommand\nomgroup[1]{%
+  \item[\bfseries
+  \ifstrequal{#1}{A}{\centerline{Numbers and Arrays}}{%
+  \ifstrequal{#1}{B}{\centerline{Linear Algebra Operations}}{%
+  \ifstrequal{#1}{C}{\centerline{Indexing}}{%
+  \ifstrequal{#1}{D}{\centerline{Calculus}}{%
+  \ifstrequal{#1}{E}{\centerline{Sets and Graphs}}{%
+  \ifstrequal{#1}{F}{\centerline{Probability and Information Theory}}{%
+  \ifstrequal{#1}{G}{\centerline{Functions}}{%
+  \ifstrequal{#1}{H}{\centerline{Datasets and Distributions}}{%
+  \ifstrequal{#1}{O}{\centerline{Other symbols}}{}}}}}}}}}%
+]}
+% -----------------------------------------
+
+\nomenclature[A]{$\displaystyle a$}{ A scalar (integer or real)}
+\nomenclature[A]{$\displaystyle \va$}{A vector}
+\nomenclature[A]{$\displaystyle \mA$}{A matrix}
+\nomenclature[A]{$\displaystyle \tA$}{A tensor}
+\nomenclature[A]{$\displaystyle \mI_n$}{Identity matrix with $n$ rows and $n$ columns}
+\nomenclature[A]{$\displaystyle \mI$}{Identity matrix with dimensionality implied by context}
+\nomenclature[A]{$\displaystyle \ve^{(i)}$}{Standard basis vector $[0,\dots,0,1,0,\dots,0]$ with a 1 at position $i$}
+\nomenclature[A]{$\displaystyle \mathrm{diag}(\va)$}{A square, diagonal matrix with diagonal entries given by $\va$}
+\nomenclature[A]{$\displaystyle \ra$}{A scalar random variable}
+\nomenclature[A]{$\displaystyle \rva$}{A vector-valued random variable}
+\nomenclature[A]{$\displaystyle \rmA$}{A matrix-valued random variable}
+
+
+\nomenclature[B]{$\mA^\top$}{Transpose of matrix $\mA$}
+\nomenclature[B]{$\mA^+$}{Moore-Penrose pseudoinverse of $\mA$}
+\nomenclature[B]{$\symbfit{A} \odot \symbfit{B}$}{Element-wise (Hadamard) product of $\mA$ and $\mB$}
 % Wikipedia uses \circ for element-wise multiplication but this could be confused with function composition
-$\displaystyle \mathrm{det}(\mA)$ & Determinant of $\mA$ \\
-\end{tabular}
-\egroup
-\index{Transpose}
-\index{Element-wise product|see {Hadamard product}}
-\index{Hadamard product}
-\index{Determinant}
-\end{minipage}
+\nomenclature[B]{$\displaystyle \mathrm{det}(\mA)$}{Determinant of $\mA$}
+
+\nomenclature[C]{$\displaystyle \eva_i$}{Element $i$ of vector $\va$, with indexing starting at 1}
+\nomenclature[C]{$\displaystyle \eva_{-i}$}{All elements of vector $\va$ except for element $i$}
+\nomenclature[C]{$\displaystyle \emA_{i,j} \text{ or } \mA(i,j)$}{Element $i, j$ of matrix $\mA$}
+\nomenclature[C]{$\displaystyle \mA_{i, :}$}{Row $i$ of matrix $\mA$}
+\nomenclature[C]{$\displaystyle \mA_{:, i}$}{Column $i$ of matrix $\mA$}
+\nomenclature[C]{$\displaystyle \etA_{i, j, k}$}{Element $(i, j, k)$ of a 3-D tensor $\tA$}
+\nomenclature[C]{$\displaystyle \tA_{:, :, i}$}{2-D slice of a 3-D tensor}
+\nomenclature[C]{$\displaystyle \erva_i$}{Element $i$ of the random vector $\rva$}
+
+\nomenclature[D]{$\displaystyle \frac{\partial y} {\partial x} $}{Partial derivative of $y$ with respect to $x$}
+\nomenclature[D]{$\displaystyle\frac{d y} {d x}$}{Derivative of $y$ with respect to $x$}
+\nomenclature[D]{$\displaystyle \nabla_\vx y $}{Gradient of $y$ with respect to $\vx$}
+\nomenclature[D]{$\displaystyle \nabla_\mX y $}{Matrix derivatives of $y$ with respect to $\mX$}
+\nomenclature[D]{$\displaystyle \nabla_\tX y $}{Tensor containing derivatives of $y$ with respect to $\tX$}
+\nomenclature[D]{$\displaystyle \frac{\partial f}{\partial \vx} $}{Jacobian matrix $\mJ \in \R^{m\times n}$ of $f: \R^n \rightarrow \R^m$}
+\nomenclature[D]{$\displaystyle \nabla_\vx^2 f(\vx)\text{ or }\mH( f)(\vx)$}{The Hessian matrix of $f$ at input point $\vx$}
+\nomenclature[D]{$\displaystyle \int f(\vx) d\vx $}{Definite integral over the entire domain of $\vx$}
+\nomenclature[D]{$\displaystyle \int_\sS f(\vx) d\vx$}{Definite integral with respect to $\vx$ over the set $\sS$}
+
+
+\nomenclature[E]{$\displaystyle \sA$}{A set}
+\nomenclature[E]{$\displaystyle \R$}{The set of real numbers}
+\nomenclature[E]{$\displaystyle \{0, 1\}$}{The set containing 0 and 1}
+\nomenclature[E]{$\displaystyle \{0, 1, \dots, n \}$}{The set of all integers between $0$ and $n$}
+\nomenclature[E]{$\displaystyle [a, b]$}{The real interval including $a$ and $b$}
+\nomenclature[E]{$\displaystyle (a, b]$}{The real interval excluding $a$ but including $b$}
+\nomenclature[E]{$\displaystyle \sA \backslash \sB$}{Set subtraction, i.e., the set containing the elements of $\sA$ that are not in $\sB$}
+\nomenclature[E]{$\displaystyle \gG$}{A graph}
+
+
+\nomenclature[H]{$\displaystyle \pdata$}{The data generating distribution}
+\nomenclature[H]{$\displaystyle \ptrain$}{The empirical distribution defined by the training set}
+% \nomenclature[E]{$\displaystyle \mX$}{A set of training examples}
+\nomenclature[H]{$\displaystyle \vx^{(i)}$}{The $i\textsuperscript{th}$ example (input) from a dataset}
+\nomenclature[H]{$\displaystyle y^{(i)}\text{ or }\vy^{(i)}$}{The target associated with $\vx^{(i)}$ for supervised learning}
+\nomenclature[H]{$\displaystyle \mX$}{The $m \times n$ matrix with input example $\vx^{(i)}$ in row $\mX_{i,:}$}
+
+\printnomenclature[4cm]
+\addcontentsline{toc}{chapter}{Notation}

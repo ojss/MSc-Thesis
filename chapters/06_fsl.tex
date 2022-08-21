@@ -1,6 +1,7 @@
 \newcommand{\mcQ}{\mathcal{Q}}
 \newcommand{\mcS}{\mathcal{S}}
 \newcommand{\mcT}{\mathcal{T}}
+\newcommand{\mcD}{\mathcal{D}}
 \newcommand{\nwks}[2]{${#1}$-way, ${#2}$-shot}
 
 \chapter{Few-Shot Learning}\label{chap:fsl}
@@ -12,38 +13,61 @@ Second, people learn far richer representations than machines do, even for seemi
 In contrast to this, the best machine learning models and neural networks cannot perform these additional functions using their specialised learnt representations. 
 The challenge arises when we wish for AI models to learn new concepts and representations from few examples and ensure that these representations are abstract and flexible.
 
+To tackle this challenge, few-shot classification is cast as a task of predicting class labels for a set of unlabelled data points (\textit{query set}) given only a small set of labelled data points (\textit{support set}). Typically, the query and support data points are drawn from the same distribution. 
+
+Few-shot classification methods typically consist of two sequential phases: (i) \textit{pre-training} on a large dataset of \textquote{base} classes, regardless of whether the training is supervised or unsupervised. This is followed by (ii) \textit{fine-tuning} on an unseen dataset consisting of \textquote{novel} classes. Normally, the classes used in the pre-training and fine-tuning are mutually exclusive. In this paper, our focus is on the self-supervised (also sometimes interchangeably called \textquote{unsupervised} in the literature) setting where we have no access to the actual class labels of the \textquote{base} dataset.
+
+To this end, various methods have been proposed and broadly categorised under two different approaches:
+\begin{itemize}
+    \item \textbf{Meta-learning}. Where an algorithm \textquote{learns how to learn} and aims to find a quickly generalisable model
+    \item \textbf{Transfer Learning}. Where the model is trained to learn optimal representations that are generalisable with minimal updates
+\end{itemize}
+
+The first approach, \textit{meta-learning}, relies on episodic training that involves creating synthetic \textquote{tasks} to mimic the downstream episodic fine-tuning phase \parencite{Finn2017Model-agnosticNetworks, Hsu2018UnsupervisedMeta-Learning, Khodadadeh2018UnsupervisedClassification, Antoniou2019AssumeAugmentation, Ye2022, lee2021meta, Ji2019UnsupervisedTraining}. 
+The second method follows a \textit{transfer learning} approach, where the network trained non-episodically to learn optimal representations in the pre-training phase, which is then followed by an episodic fine-tuning phase \parencite{Medina2020Self-SupervisedClassification, goodemballneed2020, dhillon2019baseline}.
+In this method, a feature extractor (encoder) is trained using a form of metric learning to capture the structure of the unlabelled data. 
+Next, a simple predictor (conventionally a linear layer) is utilised in conjunction with the pre-trained feature extractor for quick adaptation to the novel classes in the fine-tuning phase.
+The better the feature extractor captures the global structure of the unlabelled data, the less the predictor requires training samples and the faster it adapts itself to the unseen classes in the fine-tuning phase (also the testing phase).
+
+% Furthermore, supervised approaches that follow the episodic training paradigm may include a certain degree of \textit{task awareness}.
+% Such approaches exploit the information available in the query set during the training or testing phases \parencite{bateni2022enhancing, ye2020few, Cui2021} to alleviate the model's sample bias. As a results of this, task-awareness allows the model to learn task-specific embeddings by better aligning the features of the support and query samples.
+We also see a set of supervised approaches that do not rely purely on a convolutional feature extractor. Instead, these approaches also make use of graphs and graph neural networks \parencite{garcia2018fewshot, kim2019edge, yu2022hybrid, yang2020dpgn}. Using a graph neural network (GNN) can help in modelling instance-level and class-level relationships. GNN's can also help propagate labels by using a task-agnostic classifier, and such methods have been shown to work quite effectively compared to their standard convolutional counterparts \parencite{kim2019edge, garcia2018fewshot, yu2022hybrid, yang2020dpgn}. However, graph-based methods have eluded the unsupervised setting.
+
+Several recent studies have questioned the necessity of meta-learning for few-shot classification \parencite{goodemballneed2020, Medina2020Self-SupervisedClassification, dhillon2019baseline, ziko2020laplacian, boudiaf2020information,chen2021self}. They report competitive performance on few-shot benchmarks without episodic training or few-shot task-based experiences during training. These methods follow the second approach and aim to solve the few-shot learning problem by fine-tuning a pre-trained feature extractor with a standard cross-entropy loss.
+Some of these methods \parencite{Medina2020Self-SupervisedClassification, goodemballneed2020, das2022confess} in the space demonstrate that the transfer learning approach outperforms meta-learning based methods in standard in-domain and cross-domain settings - where the training and novel classes come from totally different distributions.
+
 \section{Formalising the Few-Shot Learning Problem}\label{sec:formalising-fsl}
 
 In a few-shot setting, the model aims to generalise well and quickly enough on a variety of new and potentially unseen tasks after being trained for optimal performance on various learning tasks.
 Each task is associated with a dataset $\mathcal{D}$, containing both inputs and true labels. 
 The model parameters of an optimal generalisable model are defined as follows:
 \begin{equation}
-    \symbfit{\theta}^\star = \arg\min_{\symbfit \theta} \mathbb{E}_{\mathcal{D}\sim p(\mathcal{D})} [\mathcal{L}_{\symbfit \theta}(\mathcal{D})]
+    \symbfit{\theta}^\star = \arg\min_{\symbfit \theta} \mathbb{E}_{\mathcal{D}\sim \pdata} [\mathcal{L}_{\symbfit \theta}(\mathcal{D})]
 \end{equation}
 
 First, we look at how \(\mathcal{D}\) is structured in a standard supervised few-shot setting. 
-Consider a labelled dataset of size $M$, $\mathcal{D} = \left\{(\symbfit{x}_i, y_i)\, |\, i \in [1,M] \right\}$ of images $\symbfit{x}_i$ and class labels $y_i$. 
-This dataset $\mathcal{D}$ is divided into three disjoint subsets: $\left\{\mathcal{D}^\textup{tr}\, \cup\, \mathcal{D}^\textup{val}\, \cup\, \mathcal{D}^\textup{test}\right\} \in \mathcal{D}$, respectively, referring to the training, validation, and test subsets. The validation dataset $\mathcal{D}^\textup{val}$ is used for model selection and the testing dataset $\mathcal{D}^\textup{test}$ for final evaluation. The episodic training is carried out on a set of tasks $\mathcal{T}_i \sim p(\mathcal{T})$. 
-Every \textquote{task} is a self-contained learning problem, each relying on small \textquote{support} and \textquote{query} sets to mimic the few-shot circumstances encountered during evaluation.
-The tasks are constructed by drawing $K$ random samples from $N$ different classes, which we denote as an ($N$-way, $K$-shot) task. 
-Specifically, each task $\mathcal{T}_i$ is made up of a $\textit{support}$ and a $\textit{query}$ set, $\mcT_i=\langle \mcS, \mcQ \rangle$, and each task can also be referred to as an \textquote{episode}. 
-The support set $\mcS$ contains $K$ samples per class, and the query set $\mcQ$ contains $Q$ samples per class. For a given task, the $NK$ support and $NQ$ query images are mutually exclusive to evaluate the generalisation performance of the model.
+Consider a labelled dataset of size $M$, $\mathcal{D} = \{({\symbfit x}_i, y_i)\}_{i = 1}^{M}$ of images $\symbfit{x}_i$ and class labels $y_i$. 
+This dataset $\mathcal{D}$ is divided into three disjoint subsets: $\left\{\mathcal{D}_\textup{tr}\, \cup\, \mathcal{D}_\textup{val}\, \cup\, \mathcal{D}_\textup{tst}\right\} \in \mathcal{D}$, referring to the training, validation, and test subsets, respectively.
+
+Next, we define a set of randomly sampled tasks $\mathcal{T}_i$ drawn from the training dataset $\mathcal{D}_{\textup{tr}} = \{({\symbfit x}_i, y_i)\}_{i = 1}^{M^\textup{tr}}$ of size $M^\textup{tr}$. A task $\mathcal{T}_i$ consists of two parts: (i) the support set $\mathcal{S}$ form which the model learns, (ii) the query set $\mathcal{Q}$ on which the model is evaluated. The support set $\mathcal{S}$ is constructed by drawing $K$ labelled random samples from $N$ different classes resulting in the so-called ($N$-way, $K$-shot) settings.
+Therefore, each task $\mathcal{T}_i$ is made up of a $\textit{support}$ and a $\textit{query}$ set, $\mcT_i=\langle \mcS, \mcQ \rangle$, and each task can also be referred to as an \textquote{episode}. Any given task contains $NK$ support and $NQ$ query images, respectively, that are mutually exclusive.
+% This dataset $\mathcal{D}$ is divided into three disjoint subsets: $\left\{\mathcal{D}^\textup{tr}\, \cup\, \mathcal{D}^\textup{val}\, \cup\, \mathcal{D}^\textup{test}\right\} \in \mathcal{D}$, respectively, referring to the training, validation, and test subsets. The validation dataset $\mathcal{D}^\textup{val}$ is used for model selection and the testing dataset $\mathcal{D}^\textup{test}$ for final evaluation. The episodic training is carried out on a set of tasks $\mathcal{T}_i \sim p(\mathcal{T})$. 
+% Every \textquote{task} is a self-contained learning problem, each relying on small \textquote{support} and \textquote{query} sets to mimic the few-shot circumstances encountered during evaluation.
+% The tasks are constructed by drawing $K$ random samples from $N$ different classes, which we denote as an ($N$-way, $K$-shot) task. 
 \begin{figure}[ht]
     \centering
     \captionsetup{justification=centering}
-    \includegraphics[width=\linewidth]{chapters/assets/fsl/few-shot-classification.png}
-    \caption{An example of (\nwks{2}{4}) image classification.}
+    \includegraphics[width=\linewidth]{chapters/assets/fsl/n3k2.png}
+    \caption{An example of (\nwks{3}{2}) image classification.}
     \label{fig:fsl-tasks}
 \end{figure}
 
-In most training routines, tasks are randomly sampled from a task distribution according to the (\nwks{N}{K}) setting, and then the model parameters are updated by back-propagation after each task.
-This comprises one episode. The model is expected to quickly learn the optimal parameters from the $NK$ support data points and apply the learnt weights to classify the $NQ$ unlabelled query data points, on which performance is evaluated.
-\Cref{fig:fsl-tasks} shows (\nwks{2}{4}) training tasks, it should be noted that even during testing (downstream classification task) the model is presented with tasks that are in the same (\nwks{2}{4}) form as the training tasks.
+In most training routines, tasks are randomly sampled from a task distribution based on the training subset $\mcD_\textup{tr}$ of the dataset $\mcD$ according to the (\nwks{N}{K}) setting, and then the model parameters are updated by back-propagation after each task is processed.
+This comprises one \textbf{episode}. The model is expected to quickly learn the optimal parameters from the $NK$ support data points and apply the learnt weights to classify the $NQ$ unlabelled query data points, on which performance is evaluated.
+\Cref{fig:fsl-tasks} shows (\nwks{3}{2}) training tasks, it should be noted that even during testing (downstream classification task) the model is presented with tasks that are in the same (\nwks{3}{2}) form as the training tasks.
 
 \section{Model Agnostic Meta Learning (MAML)}\label{sec:maml}
-\textbf{Meta-learning} is most commonly understood as learning to learn, which refers to the process of improving a learning algorithm over multiple learning episodes and was first proposed by \textcite{schmidhuber:1987:srl}. On the contrary, conventional ML improves model predictions on multiple data instances. 
-During base learning, an \emph{inner} learning algorithm solves a task such as image classification, defined by a dataset and an objective. During meta-learning, an \emph{outer} algorithm updates the inner learning algorithm so that the model it learns improves an outer objective.
-The learning episodes of the base task, namely tuples of the image $\bfitx_i$ and associated label $y_i$, can be seen to provide the instances that the outer algorithm needs to learn the base learning algorithm
+
 
 \begin{wrapfigure}{r}{0.25\linewidth}
     \centering
@@ -51,34 +75,34 @@ The learning episodes of the base task, namely tuples of the image $\bfitx_i$ an
     \caption{MAML tries to find optimal generalised weights, by first finding optimal weights in the inner learning phase.}
     \label{fig:maml}
 \end{wrapfigure}
-MAML is a gradient-based \textbf{meta learning} method. It is a technique that works with any model that learns through gradient descent. It trains a model to find an optimal set of weights that can be quickly adapted to a new task, through a few gradient descent steps. The meta-learner tries to find an initial set of weights that are not only useful for adapting to various problems, but also can be adapted quickly (in a small number of steps) and efficiently (using only a few examples).
+\textbf{Meta-learning} is most commonly understood as \textquote{learning to learn}, which refers to the process of improving a learning algorithm over multiple learning episodes and was first proposed by \textcite{schmidhuber:1987:srl}. On the contrary, conventional ML improves model predictions on multiple data instances. 
+During base learning, an \emph{inner} learning algorithm solves a task such as image classification, defined by a dataset and an objective. During meta-learning, an \emph{outer} algorithm updates the inner learning algorithm so that the model it learns improves an outer objective.
+The learning episodes of the base task, namely tuples of the image $\bfitx_i$ and associated label $y_i$, can be seen to provide the instances that the outer algorithm needs to learn the base learning algorithm
 
-In \Cref{fig:maml} we try to find a set of parameters $\theta$ that can be easily adapted. MAML optimises for a set of parameters so that when a gradient step is taken with respect to a particular task $\mcT_i $ (the grey lines), the parameters are close to the optimal parameters $\theta^*_i$ for task $\mcT_i$.
+MAML is a gradient-based \textbf{meta learning} method. It is a technique that works with any model that learns through gradient descent. It trains a model to find an optimal set of weights that can be quickly adapted to a new task, through a few gradient descent steps. The meta-learner tries to find an initial set of weights that are not only useful for adapting to various problems, but also can be adapted quickly (in a small number of steps) and efficiently (using only a few examples).
+\Cref{fig:maml} illustrates how MAML should work at meta-test time. We are looking for a pre-trained parameter that can reach near-optimal parameters for every task in one or a few gradient steps.
 
 This approach is fairly simple and has several advantages. It does not make any assumptions about the form of the model. It is quite efficient - no additional parameters are introduced for meta-learning, and the learner strategy uses a known optimisation process (gradient descent), rather than having to come up with one from scratch. It can also be easily applied to a number of domains, including classification, regression, and reinforcement learning. However, it can be computationally expensive due to the use of higher-order gradients, as we will see.
 
-Given a task and its associated support and query sets $\langle \mcS, \mcQ \rangle$, we can update the model parameters by one or more gradient descent steps (the following example contains only one step):
+\subsection{Meta-training}\label{ssec:meta-training}
+More formally, we define a \textbf{base model} to be a neural network $\ft$ with meta-parameters $\symbfit \theta$. We want to learn an initial $\symbfit{\theta}^\star = \symbfit{\theta}_0$ that, after a small number $n$ of gradient update steps on data from a support set $\mcS_b$ to obtain $\symbfit{\theta}_n$, the network performs well on the query set of that task $\mcQ_b$. Here, $b$ is the index of a particular task $\mcT_b$. The $n$ gradient update steps form what is known as the \textbf{inner-loop update process}. The updated base-network parameters after $i$ steps on data from the support task $\mcS_b$ can be expressed as
 \begin{equation}
-    \theta^\prime_i = \theta - \eta \nabla_\theta\mathcal{L}^{(0)}_{\mcT_i}(f_\theta)
-    \label{eqn:one-task-maml}
+\label{eqn:inner-update}
+\symbfit{\theta}_{i}^{b}=\symbfit{\theta}_{i-1}^{b}-\eta \nabla_{\symbfit{\theta}} \mathcal{L}_{S_{b}}\left(f_{\symbfit{\theta}_{i-1}^{b}}\right)
 \end{equation}
-where $\mathcal{L}^{(0)}$ is the loss calculated using the task with id $(0)$.
-
+where $\eta$ is the learning rate, $\symbfit{\theta}_i^b$ are the weights of the base network after $i$ steps with task $\mcT_b$, $\mathcal{L}_{S_{b}}\left(f_{\symbfit{\theta}_{i-1}^{b}}\right)$ is the loss on the support set of task $b$ after $(i-1)$ (the previous step) update steps. Assuming that our \textit{task batch} (a batch of tasks instead) size is $B$ we can define a meta-objective, which can be expressed as:
 \begin{equation}
-    \begin{aligned}
-            \theta^* 
-            &= \arg\min_\theta \sum_{\mcT_i \sim p(\mcT)} \mathcal{L}_{\mcT_i}^{(1)} (f_{\theta'_i}) = \arg\min_\theta \sum_{\mcT_i \sim p(\mcT)} \mathcal{L}_{\mcT_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\mcT_i}^{(0)}(f_\theta)}) & \\
-            \theta &\leftarrow \theta - \beta \nabla_{\theta} \sum_{\mcT_i \sim p(\mcT)} \mathcal{L}_{\mcT_i}^{(1)} (f_{\theta - \alpha\nabla_\theta \mathcal{L}_{\mcT_i}^{(0)}(f_\theta)}) & \scriptstyle{\text{; updating rule}}
-    \end{aligned}
-    \label{eqn:maml-update-rule}
+\label{eqn:meta-obj}
+\mathcal{L}_{m e t a}\left(\symbfit{\theta}_{0}\right)=\sum_{b=1}^{B} \mathcal{L}_{\mcQ_{b}}\left(f_{\symbfit{\theta}_{n}^{b}\left(\symbfit{\theta}_{0}\right)}\right)
 \end{equation}
-
-The update rule in \Cref{eqn:one-task-maml} optimises only for one task. To achieve a good generalisation on a variety of tasks, we would like to find the optimal $\theta^\star$ so that task-specific fine-tuning is more efficient.
-Now, we sample a new task with id $(1)$ to update the outer objective (also called the meta-objective).
-For the outer objective, we use the meta-update rule given in \Cref{eqn:maml-update-rule}, the task-specific parameters are used to calculate the loss on a query set, and based on this loss, the meta-update is applied. The meta-update is essentially a roll-out of task-specific optimisation and back-propagation through the optimisation process.
-The loss, denoted as $\mathcal{L}^{(1)}$, depends on the task $(1)$. The superscripts in $\mathcal{L}^{(0)}$ and $\mathcal{L}^{(1)}$ only indicate different tasks and refer to the same loss objective for the same task.
-For more details, please refer to \parencite{Finn2017Model-agnosticNetworks}.
-
+where we explicitly show the dependence of $\symbfit{\theta}_N^b$ on $\symbfit{\theta}_0$, given by unrolling \Cref{eqn:inner-update}. The meta-objective in \cref{eqn:meta-obj} measures the quality of an initialisation $\symbfit{\theta}_0$ in terms of the total loss of using that initialisation over a collection of tasks (i.e. a batch of tasks).
+This meta objective is now minimised to optimise the initial parameter value $\symbfit{\theta}_0$, this $\symbfit{\theta}_0$ contains within it the across-task experiences and knowledge. This process of optimising for the meta-objective is called the \textbf{outer-loop} update process.
+The resulting update process is shown in \cref{eqn:meta-update}, where $\beta$ is a learning rate and $\mathcal{L}_{\mcQ_b}$ denotes the loss on the query set for task $\mcT_b$.
+For more details, please refer to \parencite{Finn2017Model-agnosticNetworks, antoniou2018train}.
+\begin{equation}
+\label{eqn:meta-update}
+\symbfit{\theta}_{0}=\symbfit{\theta}_{0}-\beta \nabla_{\symbfit{\theta}} \sum_{b=1}^{B} \mathcal{L}_{\mcQ_{b}}\left(f_{\symbfit{\theta}_{N}^{b}\left(\symbfit{\theta}_{0}\right)}\right)
+\end{equation}
 
 \section{Prototypical Networks}\label{ssec:protonets}
 
@@ -107,28 +131,28 @@ where $d$ can be any distance function, as long as it is a differentiable operat
 
 Learning is carried out by minimising the negative log likelihood $J(\symbfit{\theta})$ and performing stochastic gradient descent over the same to update the kernel's parameters $\symbfit{\theta}$:
 \begin{equation}
-    J(\theta)=-\log P_{\symbfit \theta}(y=k \vert \symbfit{x}).
+    J(\symbfit{\theta})=-\log P_{\symbfit \theta}(y=k \vert \symbfit{x}).
 \end{equation}
 
-\subsection{Reinterpretation of the Prototypical Classifier as a Linear Model}\label{ssec:proto-reint-linmodel}
+\subsection{Re-interpretation of the Prototypical Classifier as a Linear Model}\label{ssec:proto-reint-linmodel}
 
 As explained by \textcite{Snell2017PrototypicalLearning}, Prototypical Networks can be re-interpreted as a linear classifier applied to a learned representation $f_{\symbfit{\theta}}(\bfitx)$. Using the Euclidean distance \(d(\symbfit{z}_i, \symbfit{z}_j)=\left\|\symbfit{z}_i-\symbfit{z}_j\right\|^{2}\) in \Cref{eqn:fsl-proto-classification} makes the model equivalent to a linear model and the output logits can be expressed as:
 \begin{align}
-        -\left\|f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}\right\|^{2}&=-f_{\symbfit \theta}(\symbfit{x})^{\top} f_{\symbfit \theta}(\symbfit{x})+2 \symbfit{c}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}\\
-        2 \symbfit{c}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}&=\symbf{W}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})+b_{k} \text {, where } \symbf{W}_{k}=2 \symbfit{c}_{k} \text { and } b_{k}=-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}
+        -\left\|f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}\right\|^{2}&=-f_{\symbfit \theta}(\symbfit{x})^{\top} f_{\symbfit \theta}(\symbfit{x})+2 \symbfit{c}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}^{\top} \symbfit{c}_{k} \nonumber\\
+        2 \symbfit{c}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}&=\symbfit{W}_{k}^{\top} f_{\symbfit \theta}(\symbfit{x})+b_{k} \text {, where } \symbfit{W}_{k}=2 \symbfit{c}_{k} \text { and } b_{k}=-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}
         \label{eqn:proto-lin-layer}
 \end{align}
 
-Based on \Cref{eqn:proto-lin-layer}, we can see that the $k\textsuperscript{th}$ unit of an equivalent linear layer therefore has weights \(\symbf{W}_k=2\symbfit{c}_k\) and biases $b_k=-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}=-\left\| \symbfit{c}_k \right\|^2$, which are both differentiable with respect to $\symbfit{\theta}$ as they are a function of $f_{\symbfit \theta}$. \textcite{Snell2017PrototypicalLearning} hypothesise that this linear classifier is effective because all the required non-linearity can be learnt within the embedding function $f_{\symbfit \theta}$.
+Based on \Cref{eqn:proto-lin-layer}, we can see that the $k\textsuperscript{th}$ unit of an equivalent linear layer therefore has weights \(\symbfit{W}_k=2\symbfit{c}_k\) and biases $b_k=-\symbfit{c}_{k}^{\top} \symbfit{c}_{k}=-\left\| \symbfit{c}_k \right\|^2$, which are both differentiable with respect to $\symbfit{\theta}$ as they are a function of $f_{\symbfit \theta}$. \textcite{Snell2017PrototypicalLearning} hypothesise that this linear classifier is effective because all the required non-linearity can be learnt within the embedding function $f_{\symbfit \theta}$.
 
 This interpretation also allows us to create a task-specific linear classifier layer for each episode where the layer weights are initialised based on the equivalent weights and biases of the prototypical network as defined above and in \Cref{eqn:proto-lin-layer}. Subsequently, this layer can then be optimised as usual on the given support set. When computing the update for $\symbfit{\theta}$, we allow gradients to flow through the Prototypical Network-equivalent linear layer; we may also \textbf{freeze} the embedding network $f_{\symbfit \theta}$ if we only wish to train the Prototypical Network-equivalent linear layer.
 
 
 \section{Unsupervised Few-Shot Learning}\label{sec:u-fsl}
 
-So far, we have only discussed few-shot learning in a supervised setting. However, a more challenging scenario is the unsupervised setting. Recall that the dataset in the supervised setting is given as \(\mathcal{D} = \left\{(\symbfit{x}_i, y_i)\, |\, i \in [1,M]\right\}\) which implies that we have the true class labels $y_i$ available during training time. In the unsupervised setting, we no longer have access to the true labels during the training period. 
+So far, we have only discussed few-shot learning in a supervised setting. However, a more challenging scenario is the unsupervised setting. Recall that the dataset in the supervised setting is given as \(\mathcal{D} = \{({\symbfit x}_i, y_i)\}_{i = 1}^{M}\) which implies that we have the true class labels $y_i$ available during training time. In the unsupervised setting, we no longer have access to the true labels during the training period. 
 
-Then a question naturally arises: How do we create valid tasks (see \Cref{sec:formalising-fsl}) if we do not have access to the true labels? This is an important question; consider \Cref{fig:fsl-tasks} where we illustrate (\nwks{2}{4}) shots, we see that each of the $2$ classes has exactly $4$ samples. Tasks like this would be difficult to create without labels. To overcome this, we shall discuss some creative methods in the following sections.
+Then a question naturally arises: How do we create valid tasks (see \Cref{sec:formalising-fsl}) if we do not have access to the true labels? This is an important question; consider \Cref{fig:fsl-tasks} where we illustrate (\nwks{3}{2}) shots, we see that each of the $3$ classes has exactly $2$ samples. Tasks like this would be difficult to create without labels. To overcome this, we shall discuss some creative methods in the following sections.
 
 \subsection{CACTUs}\label{ssec:ufsl-cactus}
 CACTUs was one of the first methods aimed at solving the unsupervised few-shot learning problem \parencite{Hsu2018UnsupervisedMeta-Learning}. CACTUs uses MAML as part of its training mechanism to obtain a generalisable model. CACTUS also retains the episodic task-based training strategy introduced by MAML \parencite{Finn2017Model-agnosticNetworks}. Unlike MAML, however, a major aspect of CACTUs is dedicated to a clever \textbf{task creation} technique, as it cannot be fed standard tasks, as discussed above.
@@ -138,22 +162,22 @@ CACTUs was one of the first methods aimed at solving the unsupervised few-shot l
     \caption{Illustration of CACTUs. }
     \label{fig:cactus}
 \end{figure}
-The idea of CACTUs is to use a separate embedding learning algorithm $\mathcal{E}$ on $\bfitx_i \in \mathcal{D}$ to produce embeddings $\{\symbfit{z}_i\}$. CACTUs then uses $k$-means clustering on $\{\symbfit{z}_i\}$ $P$ times to generate a set of partitions $\mathcal{P}_P = \{\mathcal{C}_P\}$. CACTUs can technically make use of any self-supervised (more generally, unsupervised) representation learning methods to train $\mathcal{E}$. \textcite{Hsu2018UnsupervisedMeta-Learning} choose to use DeepCluster \parencite{caron2018deep}, BiGAN \parencite{berthelot2018understanding}, ACAI \parencite{donahue2016adversarial}, and InfoGAN \parencite{chen2016infogan}. 
+The idea of CACTUs is to use a separate embedding learning algorithm $\mathcal{E}$ on $\bfitx_i \in \mathcal{D}$ to produce embeddings $\{\symbfit{z}_i\}$. It then uses $k$-means clustering on $\{\symbfit{z}_i\}$ $P$ times to generate a set of partitions $\mathcal{P}_P = \{\mathcal{C}_P\}$. CACTUs can technically make use of any self-supervised (more generally, unsupervised) representation learning methods to train $\mathcal{E}$. \textcite{Hsu2018UnsupervisedMeta-Learning} choose to use DeepCluster \parencite{caron2018deep}, BiGAN \parencite{berthelot2018understanding}, ACAI \parencite{donahue2016adversarial}, and InfoGAN \parencite{chen2016infogan}. 
 
 CACTUs then samples a partition $\mathcal{P}$ randomly from the set of parititons $\{\mathcal{P}_P\}$, following which a cluster $\mathcal{C}_n$ is randomly sampled from the partition $\mathcal{P}$. The cluster sampling process is carried out $N$ times for each of the classes desired in a (\nwks{N}{K}) task. Similarly, the process is repeated for $Q$ query images. Finally, the randomly sampled support and query images are used to create a \textbf{synthetic} task that is fed into MAML.
 
-A major concern here is that CACTUs is dependent on bigger models, like AlexNet \parencite{AlexNet2012}, using powerful self-supervised learning methods on a small dataset like \miniImagenet{}. The embeddings (representations) generated by this larger model are then used to create synthetic tasks to train a simpler Conv$4$ architecture. It has been known for quite some time that larger models consistently offer better performance and representations \parencite{Dosovitskiy2020, He2015}, these better representations indirectly aid a smaller Conv$4$ to learn better.
+A major concern here is that CACTUs is dependent on bigger models, like AlexNet \parencite{AlexNet2012}, using powerful self-supervised learning methods on a small dataset like \miniImagenet{}. The embeddings (representations) generated by this larger model are then used to create synthetic tasks to train a simpler Conv$4$ architecture. It has been known for quite some time that larger models consistently offer better performance and representations \parencite{Dosovitskiy2020, He2015}, these better representations indirectly aid a smaller Conv$4$ to learn better. Therefore, defeating the purpose of a self-contained end-to-end few-shot learning algorithm by using parameter heavy models and computationally intensive algorithms.
 
 \subsection{UMTRA} \label{ssec:umtra}
 
 Unsupervised Meta-learning with Tasks constructed by Random sampling and Augmentation (UMTRA), is another method that uses a MAML style training strategy with inner and outer objectives in an unsupervised fashion.
 Unlike CACTUs (\Cref{ssec:ufsl-cactus}), the focus of UMTRA is not on generating ideal tasks. 
-Instead, the idea behind UMTRA can be summarised in one line; it is an unsupervised method that uses augmentations of the images in a given task. This allows it to generate \textquote{supervised} validation tasks for the outer objective and can perform well if we span the entire space of the classes.
+Instead, the idea behind UMTRA can be summarised in one line; it is an unsupervised method that uses augmentations of the images in a given episode to create a valid query set. This allows it to generate a \textquote{labelled} query set for the outer objective and can perform well if we span the entire space of the classes.
 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=\linewidth]{chapters/assets/fsl/UnsupervisedMetaTraining3.pdf}
-    \caption{We start from a dataset of unlabelled data. The training data is created by randomly choosing $N$ samples $\bfitx_i$ from the dataset. The validation data is created by applying the augmentation function $\mathcal{A}$ to each sample from the training data. Image borrowed from \parencite{Khodadadeh2018UnsupervisedClassification}.}
+    \caption{We start from a dataset of unlabelled data. The training data is created by randomly choosing $N$ samples $\bfitx_i$ from the dataset. The query data is created by applying the augmentation function $\mathcal{A}$ to each sample from the training data. Image borrowed from \parencite{Khodadadeh2018UnsupervisedClassification}.}
     \label{fig:umtra}
 \end{figure}
 
@@ -205,7 +229,7 @@ Image sourced from \parencite{Snell2017PrototypicalLearning}.}
 
 One such method that we shall focus on is ProtoTransfer \parencite{Medina2020Self-SupervisedClassification}. Unlike \nameref{ssec:ufsl-cactus} and \nameref{ssec:umtra} ProtoTransfer does not rely on a task-based episodic training regime and does not use MAML for its training. 
 Instead, ProtoTransfer uses a form of \nameref{sec:contrastive-learning} that is similar to and inspired by \nameref{ssec:simclr}. 
-ProtoTransfer consists of two phases: (i) \highlight[comment=add this to SSL section]{\textbf{pre-training}} on a large dataset of \textquote{base} classes. This is followed by (ii) \textbf{fine-tuning} on an unseen dataset consisting of \textquote{novel} classes. 
+ProtoTransfer consists of two phases: (i) \textbf{pre-training} on a large dataset of \textquote{base} classes. This is followed by (ii) \textbf{fine-tuning} on an unseen dataset consisting of \textquote{novel} classes. 
 
 \textcite{Medina2020Self-SupervisedClassification} call their pre-training method \textbf{ProtoCLR}, and in principle it is extremely similar to \nameref{ssec:simclr}.
 ProtoCLR uses the original image, $\bfitx_i$, and $Q$ augmentations, $\{\Tilde{\bfitx}_{i,q}\}_{q=1}^Q$. In order to learn the metric embedding function, $f_{\symbfit{\theta}}(\cdot)$, a contrastive loss is used here to ensure that all $Q$ augmentations have the same representation as the original image. 

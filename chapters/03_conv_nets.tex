@@ -19,12 +19,11 @@
     \label{fig:cnn-overview}
 \end{figure}
 \footnotetext{\url{https://www.mathworks.com/discovery/convolutional-neural-network-matlab.html}}
-\citeauthor{LeCun1989} proposed the novel \textbf{convolutional neural network} (CNN) architecture to tackle computer vision tasks. The specific task \citeauthor{LeCun1989} chose to solve was the recognition of handwritten digits (today a similar dataset is the MNIST\footnote{\url{http://yann.lecun.com/exdb/mnist/}} dataset). 
+\citeauthor{LeCun1989} proposed the novel \textbf{convolutional neural network} (CNN) architecture to tackle computer vision tasks. The specific task \citeauthor{LeCun1989} chose to solve was the recognition of handwritten digits (today a similar dataset is the MNIST\footnote{\url{http://yann.lecun.com/exdb/mnist/}} dataset). The LeNet-$5$ \parencite{LeCun1989} was inspired by Neocognitron \parencite{Fukushima1975, fukushima1982neocognitron} that allowed extraction of \textbf{features} such as certain orientations, edges, and corners. The LeNet-$5$ was designed to use backpropagation for learning and proved backpropagation allowed neural nets to be used in the real world. Yann LeCun estimates that at one point this system was being used to read more than $10\%$ of all cheques in the U.S\parencite{chow_2021}.
 
+CNNs were originally inspired by early findings in the study of natural biological vision. They have since become the tools of choice in computer vision and as models of neural activity in visual tasks \parencite{Kuzovkin2018, Lindsay2021, Eickenberg2017}. The CNN architecture and its derivatives continue to be one of the best performing models (alongside newly minted vision transformers \parencite{Dosovitskiy2020}) for computer vision tasks ranging from image classification to 3D depth estimation.
 
-CNNs were originally inspired by early findings in the study of natural biological vision. They have since become the tools of choice in computer vision and as models of neural activity in visual tasks \parencite{Kuzovkin2018, Lindsay2021, Eickenberg2017}. The CNN architecture and its derivatives continue to be one of the best performing models (alongside newly the minted vision transformers \parencite{Dosovitskiy2020}) for computer vision tasks ranging from image classification to 3D depth estimation.
-
-Even though CNNs were first introduced in \citeyear{LeCun1989}, it was AlexNet \parencite{AlexNet2012} that really launched the CNN based models into the spotlight. AlexNet outperformed its competitors by around $10\%$ on the ImageNet \parencite{deng2009imagenet} benchmark. Surpassing its competitors by such a great margin propelled AlexNet and CNNs as the dominant force in computer vision problems.
+Although CNNs were first introduced in \citeyear{LeCun1989}, it was AlexNet \parencite{AlexNet2012} that really launched CNN-based models into the spotlight. AlexNet outperformed its competitors by about $10\%$ on the ImageNet \parencite{deng2009imagenet} benchmark. Surpassing its competitors by such a great margin, AlexNet and CNNs emerged as the dominant force in computer vision problems.
 
 
 An archetypal CNN (\Cref{fig:cnn-overview}) is made up of two major components, (i) a \textbf{feature extractor} and (ii) a \textbf{classification head}. The feature extractor portion is made up of multiple convolutional layers, followed by non-linear activation functions (\Cref{sec:activation-functions}) and finally some form of \textbf{pooling} is applied.
@@ -33,7 +32,7 @@ The classification head consists of an MLP that uses the output of a feature ext
 
 \section{Convolution}\label{sec:convolutions}
 
-As the name implies, the basic building block of a CNN is a \textbf{convolution operator}, which we denote by an asterisk $\ast$. In its most generic form, a convolution is an operation on two functions of a real-valued argument. Suppose that we have a water-level sensor installed in a massive fish-tank. Our sensor provides a single output $x(t)$, the level of water in the tank at the time $t$. Now, our sensor is not perfect and is somewhat noisy. 
+As the name implies, the basic building block of a CNN is a \textbf{convolution operator}, which we denote by an asterisk $\ast$. In its most generic form, a convolution is an operation on two functions of a real-valued argument. Suppose that we have a water-level sensor installed in a massive fish tank. Our sensor provides a single output $x(t)$, the level of water in the tank at the time $t$. Now, our sensor is not perfect and is somewhat noisy. 
 To decrease the noise in the measurements, we take averages of several measurements. The more recent the measurements, the more relevant they would be, so we would rather want this to be a weighted average that gives more importance to recent measurements.
 We can achieve this by using a weighting function $w(a)$, where $a$ is the age of a given measurement. Applying the weighting function produces a new function called $S$, which provides a smooth estimate of the water level in the tank:
 \begin{equation}
@@ -49,15 +48,15 @@ This operation is called \textbf{convolution} and \Cref{eqn:continous-1d-conv} i
 
 In \cref{eqn:continous-1d-conv} and \cref{eqn:conv-1d-succinct} $x$ is referred to as the \textbf{input}, the function $w$ is called the \textbf{kernel}. In the terminology of the convolutional network, the output is termed \textbf{feature map}.
 
-We can also use convolutions over multiple axes simultaneously. If we choose a two-dimensional image $I$ as input, it stands to reason that we would probably want to use a two-dimensional kernel $K$ over it:
+We can also use convolutions over multiple axes simultaneously. If we choose a two-dimensional image $\symbfit{I}$ as input, it stands to reason that we would probably want to use a two-dimensional kernel $\symbfit K$ over it:
 \begin{equation}
 \label{eqn:convolution-2d}
-S(i, j)=(I * K)(i, j)=\sum_{m} \sum_{n} I(m, n) K(i-m, j-n).
+\symbfit{S}(i, j)=(\symbfit{I} * \symbfit{K})(i, j)=\sum_{m} \sum_{n} \symbfit{I}(m, n) \symbfit{K}(i-m, j-n).
 \end{equation}
 
 As convolution is a commutative operation, we can rewrite \Cref{eqn:convolution-2d} for a convenient implementation:
 \begin{equation}
-S(i, j)=(K * I)(i, j)=\sum_{m} \sum_{n} I(i-m, j-n) K(m, n).
+\symbfit{S}(i, j)=(\symbfit{K} * \symbfit{I})(i, j)=\sum_{m} \sum_{n} \symbfit{I}(i-m, j-n) \symbfit{K}(m, n).
 \end{equation}
 
 \begin{wrapfigure}{r}{0.30\textwidth}
@@ -67,20 +66,20 @@ S(i, j)=(K * I)(i, j)=\sum_{m} \sum_{n} I(i-m, j-n) K(m, n).
     \label{fig:2d-kernel-sample}
 \end{wrapfigure}
 
-The commutative property of convolution appears as we have \textbf{flipped} the kernel relative to the input, in the sense that as $m$ increases, the index into the input increases, but the index into the kernel decreases. While useful for mathematical proofs, its not necessary to do in terms of actual implementation. Instead, many neural network libraries implement the \textbf{cross-correlation} function, which for all intents and purposes is the same as a convolution without the kernel being flipped:
+The commutative property of convolution appears as we have \textbf{flipped} the kernel relative to the input, in the sense that as $m$ increases, the index into the input increases, but the index into the kernel decreases. While useful for mathematical proofs, its not necessary to do in terms of actual implementation. Instead, many neural network libraries implement the \textbf{cross-correlation} function, which, for all intents and purposes, is the same as a convolution without the kernel being flipped:
 \begin{equation}
-S(i, j)=(K * I)(i, j)=\sum_{m} \sum_{n} I(i+m, j+n) K(m, n).
+\symbfit{S}(i, j)=(\symbfit{K} * \symbfit{I})(i, j)=\sum_{m} \sum_{n} \symbfit{I}(i+m, j+n) \symbfit{K}(m, n).
 \end{equation}\label{eqn:conv-2d-cross-correl}
 
 An example of a two-dimensional \textit{kernel} is shown in \Cref{fig:2d-kernel-sample}, and \Cref{fig:numerical_no_padding_no_strides} shows an example of a discrete convolution using the kernel in \Cref{fig:2d-kernel-sample}. 
-The blue grid is the two-dimensional input, also called the \textbf{input feature map}. In order to keep the drawing simple, a single input feature map is shown, however, it quite common to have multiple feature maps stacked on top of each other.
+The blue grid is the two-dimensional input, also called the \textbf{input feature map}. To keep the drawing simple, a single input feature map is shown; however, it is quite common to have multiple feature maps stacked on top of each other.
 The kernel slides over the input feature map and, at each location, we take a product between each element of the kernel and the input element that coincides with it.
 The results of the products are summarised to obtain the output at the current location (the centre of the kernel).
 This process can be repeated using different kernels to generate as many \textbf{output feature maps} as required (\Cref{fig:conv-full_picture}). It must be noted that the kernel can be learnt through back-propagation.
 
-\begin{figure}
+\begin{figure}[ht]
      \centering
-     \begin{subfigure}[b]{0.6\textwidth}
+     \begin{subfigure}[b]{0.8\textwidth}
         \centering
         \includegraphics[width=0.32\textwidth]{chapters/assets/2d-conv-example/numerical_no_padding_no_strides_00.pdf}
         \includegraphics[width=0.32\textwidth]{chapters/assets/2d-conv-example/numerical_no_padding_no_strides_01.pdf}
@@ -95,7 +94,7 @@ This process can be repeated using different kernels to generate as many \textbf
             values of a discrete convolution.}
      \end{subfigure}
      
-     \begin{subfigure}[b]{0.6\textwidth}
+     \begin{subfigure}[b]{0.8\textwidth}
         \centering
         \includegraphics[width=0.32\textwidth]{chapters/assets/avg-pooling/numerical_average_pooling_00.pdf}
         \includegraphics[width=0.32\textwidth]{chapters/assets/avg-pooling/numerical_average_pooling_01.pdf}
@@ -115,7 +114,7 @@ This process can be repeated using different kernels to generate as many \textbf
 \end{figure}
 
 
-\begin{figure}[bt]
+\begin{figure}[ht]
     \centering
     \captionsetup{justification=RaggedRight}
     \input{chapters/assets/conv_tikz/multi_channel_cnn.tikz}
@@ -134,13 +133,13 @@ This process can be repeated using different kernels to generate as many \textbf
 
 \section{Pooling}\label{sec:conv-pooling}
 
-In addition to convolution operation described in \cref{sec:convolutions}, \textbf{pooling} operations make up another important aspect of a CNN. Pooling operations are meant to reduce the size of the feature maps by using some function to \textbf{summarise} regions of the feature map, such as taking the average or maximum value of a collection of values in a feature map present in a window.
+In addition to the convolution operation described in \cref{sec:convolutions}, \textbf{pooling} operations make up another important aspect of a CNN. Pooling operations are meant to reduce the size of the feature maps by using some function to \textbf{summarise} regions of the feature map, such as taking the average or maximum value of a collection of values in a feature map present in a window.
 
 Pooling operations work similarly to a convolution by sliding a window across the input and applying a pooling function to the contents of the window. 
 Pooling operations replace the linear combination described by the kernel with some other function. \Cref{fig:numerical_average_pooling} shows an example of the \textbf{average pooling} operation, which applies the averaging function on the contents of the sliding window. Similarly, \textbf{maximum pooling} is another pooling operation that takes the maximum of the content present in the sliding window.
 
 \section{Kernels as Feature Extractors}\label{sec:kernel-feature-extractor}
-Each convolutional layer is characterised by the size of the kernels, the number of kernels, the padding and \textbf{stride}; the relationship between these components is not trivial to intuitively infer. Every kernel's weights act as a particular feature detector, and thus learning the kernel's weights translates into learning the features. \Cref{fig:feature-viz} shows the types of features and patterns learnt by a fully trained model in various layers. Note that as the number of layers increases, the network is learning more specific and complex patterns.
+Each convolutional layer is characterised by the size of the kernels, the number of kernels, the padding, and \textbf{stride}; the relationship between these components is not trivial to intuitively infer. Every kernel's weights act as a particular feature detector, and thus learning the kernel's weights translates into learning the features. \Cref{fig:feature-viz} shows the types of features and patterns learnt by a fully trained model in various layers. Note that as the number of layers increases, the network is learning more specific and complex patterns.
 
 \begin{figure}[ht]
     \centering
