@@ -28,7 +28,7 @@ Deep neural networks can be considered representation learning models that typic
 \begin{figure}[h]
     \centering
     \includegraphics[scale=0.4]{chapters/assets/ssl_figs/ssl_rep_learning_images.png}
-    \caption{Deep neural networks combine simple concepts to learn representations and derive complex structures in a hierarchical pipeline. Each layer refines  information from the previous layer. Finally, the  classifier takes the transformed representation and draws boundaries between classes. See \Cref{fig:feature-viz} for more.}
+    \caption{Deep neural networks combine simple concepts to learn representations and derive complex structures in a hierarchical pipeline. Each layer refines  information from the previous layer. Finally, the  classifier takes the transformed representation and draws boundaries between classes. See \Cref{fig:feature-viz} for more. Image from \parencite{GoodfellowDLBook2016}.}
     \label{fig:small-cnn-features}
 \end{figure}
 
@@ -51,9 +51,7 @@ However, representation learning aims at mapping representations to other repres
 
 As mentioned above in this text, self-supervision usually involves formulating a specialised supervised task; this task is also called a \textbf{pretext task}. However, we normally do not care about the performance of the model on this artificial task. Rather, we are more concerned with the intermediate learned representations with the hope that this representation carries with it good semantic or structural meanings that be beneficial to a wide variety of real word tasks.
 
-For example, we might rotate images at four random angles and train a model to predict how each image has been rotated. Here, the task of predicting rotations is the pretext task, so the actual accuracy on this task is irrelevant to us \parencite{gidaris2018unsupervised}. Instead, we expect the model to learn high-quality latent representations that are useful for other real-world tasks.
-
-However, this is not the only way, and in the next section we shall discuss one of the most popular techniques in this space.
+For example, we might rotate images at four random angles and train a model to predict how each image has been rotated. Here, the task of predicting rotations is the pretext task, so the actual accuracy on this task is irrelevant to us \parencite{gidaris2018unsupervised}. Instead, we expect the model to learn high-quality latent representations that are useful for other real-world tasks. However, this is not the only way, and in the next section we shall discuss one of the most popular techniques in this space.
 
 \section{Contrastive Representation Learning}\label{sec:contrastive-learning}
 The goal of contrastive representation learning is to learn a feature subspace in which similar (positive) pairs of data items stay close to each other while dissimilar (negative) pairs are farther apart. Contrastive learning can be applied to both supervised and unsupervised settings. For unsupervised learning, contrastive learning remains one of the most powerful approaches to self-supervised learning.
@@ -61,8 +59,13 @@ The goal of contrastive representation learning is to learn a feature subspace i
 When working in a supervised setting, it is easy to find positive pairs of the data; one only needs to fetch images that are associated with the same true label. However, in an unsupervised setting, we have no such label information; therefore, we must get creative in order to teach the network what constitutes as a positive pair of images. This brings us to one of the most intuitive techniques, SimCLR \parencite{chen2020simple}.
 
 \subsection{SimCLR} \label{ssec:simclr}
-
-\begin{figure}[th]
+\begin{figure}[t]
+    \centering
+    \includegraphics[scale=0.4]{chapters/assets/ssl_figs/simclr_contrastive_learning.png}
+    \caption{SimCLR works by augmenting an image twice and ensuring their representations are close to each other while being farther away from representations of other augmented images.}
+    \label{fig:simclr}
+\end{figure}
+\begin{figure}[t]
 \centering
 \begin{subfigure}{.19\textwidth}
   \centering
@@ -109,6 +112,12 @@ When working in a supervised setting, it is easy to find positive pairs of the d
 \caption{Illustrations of data augmentation operators. (Original image cc-by: Von.grzanka)}
 \label{fig:simclr-data_aug}
 \end{figure}
+\begin{figure}[t]
+    \centering
+    \includegraphics[scale=0.3]{chapters/assets/ssl_figs/positives-pairs.png}
+    \caption{This figure shows a set of images on the left being transformed using functions $t$ and $t^\prime$ giving us pairs of positve images shown on the right. Image from \parencite{silva2021reprlearning}.}
+    \label{fig:positive-pairs}
+\end{figure}
 
 The idea behind SimCLR is quite simple and elegant. An image $\symbfit{x}$ is randomly sampled from the dataset, and then two random transformations are applied to the image to obtain two augmented images $\symbfit{x}_i$ and $\symbfit{x}_j$. Each image is passed through the encoder to obtain the representations $\symbfit{z}_i$ and $\symbfit{z}_j$, respectively. The goal here is to maximise the similarity between $\symbfit{z}_i$ and $\symbfit{z}_j$, see \Cref{fig:simclr} for a small overview of SimCLR. \Cref{fig:simclr-data_aug} shows a few examples of the type of image transformations used by SimCLR.
 
@@ -118,7 +127,7 @@ In order to train the network to bring the said representations closer, we first
 s_{i, j}=\frac{\symbfit{z}_{i}^{\top} \symbfit{z}_{j}} {\left(\left\|\symbfit{z}_{i}\right\|\left\|\symbfit{z}_{j}\right\|\right)}
 \end{equation}
 
-\highlight[comment=maybe add an example of the mini batch]{We} calculate the pairwise cosine similarity between each augmented image in a mini-batch using \Cref{eqn:simclr-cosine-sim}. In the ideal case, the similarity between all \textit{postive} pairs must be high and low between all \textit{negative} pairs.
+We calculate the pairwise cosine similarity between each augmented image in a mini-batch using \Cref{eqn:simclr-cosine-sim}. \cref{fig:positive-pairs} shows an example of what positive pairs might look like. In the ideal case, the similarity between all \textit{positive} pairs must be high and low between all \textit{negative} pairs.
 
 Next, we use pairwise cosine similarities to calculate the loss. The loss is called \textbf{NT-Xent} (normalised temperature-scaled cross-entropy loss) or NCE (noise contrastive estimator) and is given as
 \begin{equation}
@@ -127,21 +136,13 @@ Next, we use pairwise cosine similarities to calculate the loss. The loss is cal
 \end{equation}
 where $\tau$ is the temperature scaling factor. The reader is urged to recognise the similarities between \Cref{eqn:nt-xent} and \Cref{eqn:std-softmax}. \Cref{eqn:nt-xent} is indeed just the normal $\operatorname{softmax}$ (\Cref{eqn:std-softmax}) with an additional temperature scaling factor.
 
-Normally a mini-batch of $n$ samples is randomly sampled, since the contrastive pretext task is defined on pairs of augmented images derived from the minibatch, it results in a total of $2n$ data points. The negative samples are not sampled explicitly. Instead, given a positive pair, the other $2(n-1)$ augmented samples in a mini-batch are treated as negative samples.
+Normally a mini-batch of $n$ samples is randomly sampled, since the contrastive pretext task is defined on pairs of augmented images derived from the mini-batch, it results in a total of $2n$ data points. The negative samples are not sampled explicitly. Instead, given a positive pair, the other $2(n-1)$ augmented samples in a mini-batch are treated as negative samples.
 
-You can choose $\tau$ to be any value; higher values of $\tau$ will lead to a \textquote{softer} output distribution of probabilities, for example, $\left[0.01,0.01,0.98\right]$.
-As $\tau$ approaches $0$, it will lead to a distribution \textquote{sharper}, for example, $\left[0.2,0.2,0.6\right]$.
+You can choose $\tau$ to be any value; higher values of $\tau$ will lead to a \textquote{softer} output distribution of probabilities, for example, $\left[0.2,0.2,0.6\right]$.
+As $\tau$ approaches $0$, it will lead to a distribution \textquote{sharper}, for example, $\left[0.01,0.01,0.98\right]$.
 A distribution of \textquote{softer} implies that the model is less confident in its predictions, while \textquote{sharper} implies that the model is very confident.
-
 A low temperature ($<1$) discourages predictions from collapsing to a uniform distribution, which is undesirable. When we talk about collapse, we are talking about \textbf{representation collapse}. Representation collapse is a phenomenon where in the network outputs the same representation regardless of the input, as one can imagine if every pair of images has the same representation, the loss would be incredibly low. However, if the network returns the same representation for all input, its not very useful for downstream tasks that require the features to be discriminative and have semantic information.
 
 \begin{tcolorbox}[title=Intuition for Temperature]
 The temperature parameter penalises the larger logits more than the smaller logits. The exponential function is an \textquote{increasing function}. So, if a term is already large, penalising it by a small amount would make it much smaller (\% wise) than if that term were small.
 \end{tcolorbox}
-
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.4]{chapters/assets/ssl_figs/simclr_contrastive_learning.png}
-    \caption{SimCLR works by augmenting an image twice and ensuring their representations are close to each other while being farther away from representations of other augmented images.}
-    \label{fig:simclr}
-\end{figure}

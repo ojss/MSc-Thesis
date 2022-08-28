@@ -5,7 +5,7 @@ Deep learning is an area of machine learning that uses Artificial Neural Network
 \section{Deep Feedforward Networks} \label{sec:feed-forward-nets}
 
 Deep feedforward networks, also called feedforward networks, or \textbf{multilayer perceptrons} (MLPs), are essential deep learning models. The goal of a feedforward network is to approximate some ideal function \(f^\star\). 
-For example, a classifier \(y = f^\star(\symbfit{x})\) is a mapping between input $\symbfit{x}$ to a category $y$. A feedforward network has the ability to learn this mapping \(\symbfit{y} = f(\symbfit{x} \mathsemicolon \symbfit{\theta})\) where $\symbfit{\theta}$ is a set of learnt parameters that results in the best approximation of function $f^\star \approx f(\symbfit{x} \mathsemicolon \symbfit{\theta})$. In other words, neural networks (deep or otherwise) are function approximators.
+For example, a classifier \(y = f^\star(\symbfit{x})\) is a mapping between input $\symbfit{x}$ to a category $y$. A feedforward network has the ability to learn this mapping \(\symbfit{y} = f(\symbfit{x} \mathsemicolon \symbfit{\theta})\) where $\symbfit{\theta}$ is a set of learnt parameters that results in the best approximation of function $f(\symbfit{x} \mathsemicolon \symbfit{\theta}) \approx f^\star$. In other words, neural networks are function approximators.
 
 These models are called \textbf{feedforward} because the information flows through the function that evaluates $\symbfit{x}$ and produces $\symbfit{y}$. The process of passing the input $\symbfit{x}$ through the function and through intermediate computations is known as \textbf{forward pass}.
 We then use a \textbf{loss function} to measure the difference between $f^\star$ and $f$ - that is, the difference between the ideal mapping $f^\star$ and the estimated mapping $f$. 
@@ -69,13 +69,13 @@ The parameters of the network, $\symbfit{\theta}$, are updated in a \textbf{back
 Feedforward neural networks are called \textit{networks} because they are typically composed of many different functions. The model is associated with a directed acyclic graph that describes how the functions are composed together.
 For example, we can have three functions \(f^{(1)}, f^{(2)}\) and $f^{(3)}$ connected in a chain, to form \(f = f^{(1)} \circ f^{(2)} \circ f^{(3)}\). 
 Chain structures such as these are quite commonly used structures of neural networks. Here, $f^{(1)}$ is the \textbf{first layer}, $f^{(2)}$ is the \textbf{second layer} and so on. 
-The final layer is called \textbf{output layer}, in this small example, $f^{(3)}$ is the output layer. The training data or training strategy determines what the output layer must produce for each given input $\symbfit{x}$.
+The final layer is called \textbf{output layer}, in this small example, $f^{(3)}$ is the output layer. The training data and training strategy determine what the output layer must produce for each given input $\symbfit{x}$.
 Intermediate layers such as $f^{(2)}$ that do not directly produce the output $\symbfit{y}$ are called \textbf{hidden layers}.
 
 Each hidden layer of the network is typically vector valued. The dimensionality of these hidden layers determines \textbf{width} of the model. Each element in the vector plays a role analogous to a neuron. Instead of thinking of a layer as a vector-to-vector function, we can also think of the layer as consisting of many \textbf{units} that act in parallel \parencite{Pinker1988}, each representing a vector-to-scalar function. 
 \Cref{fig:mlp} shows a small MLP with a single hidden layer. Each of the nodes in \cref{fig:mlp} represents a value in a vector; this implies that the input $\symbfit{x}$ has a dimensionality of $4$, the hidden layer (intermediate values) has a dimensionality of $5$ and the output has a dimensionality of $3$.
 
-Now, we must choose the form of our model, $f(\symbfit{x} \mathsemicolon \symbfit{\theta})$. Let us choose a linear model parameterised by $\symbfit{\theta}$ consisting of $\symbfit{w}$ and $b$, where $\symbfit{w}$ provides the weights and $b$ provides the biases (or intercepts):
+Now, we must choose the form of our model, $f(\symbfit{x} \mathsemicolon \symbfit{\theta})$. Let us choose a linear model parameterised by $\symbfit{\theta}$ consisting of $\symbfit{w}$ and $b$, where $\symbfit{w}$ provides the \textbf{weights} and $b$ provides the \textbf{biases} (or intercepts):
 \begin{equation}
     \label{eqn:linear-model}
     f(\symbfit{x}; \symbfit{\theta}) = f(\symbfit{x} ; \symbfit{w}, b)=\symbfit{x}^{\top} \symbfit{w} + b.
@@ -158,20 +158,20 @@ Like the sigmoid function, the \textbf{tanh} (hyperbolic tan) function also squa
 \end{figure}
 
 \section{Loss Function}\label{sec:loss-fn}
-During training, for each training sample in the training set $\{\symbfit{x}_i, y_i\}_{i=1}^m$ where $\symbfit{x}_i$ is an input vector and $y_i$ is the corresponding label, we present the input $\symbfit{x}$ to the neural network and compare the predicted output of the network $\hat{y}_i$ with the corresponding label $y_i$.
+During training, for each training sample in the training set $\{\symbfit{x}_i, y_i\}_{i=1}^N$ where $\symbfit{x}_i$ is an input vector and $y_i$ is the corresponding label, we present the input $\symbfit{x}$ to the neural network and compare the predicted output of the network $\hat{y}_i$ with the corresponding label $y_i$.
 We need to define a \textbf{loss function} to objectively measure how much the predicted output of the network $\hat{y}_i$ is different from the expected output $y_i$. For regression problems, the quadratic loss function called the mean squared error (MSE) is calculated as follows:
 \begin{equation}
-    \mathcal{L}(\symbfit{\hat{y}}, \symbfit{y}) = \frac{1}{2} \| \symbfit{y} - \symbfit{\hat{y}} \| ^ 2
+    \mathcal{L}({\hat{y}}, {y}) = \frac{1}{2} \| {y} - {\hat{y}} \| ^ 2
 \end{equation}
 
 The loss function is calculated for each training example in the training set. The average of the calculated loss functions for all training examples in the training set is called the \textbf{cost function}. For MSE it is the average of the calculated loss functions for all training examples in the training set:
 \begin{equation}
-    J(\symbfit{\theta}) = \frac{1}{2m} \sum_{j=1}^{m} \| \symbfit{y}_i - \symbfit{\hat{y}_i} \| ^ 2
+    J(\symbfit{\theta}) = \frac{1}{2N} \sum_{i=1}^{N} \| {y}_i - {\hat{y}_i} \| ^ 2
 \end{equation}
-where $m$ is the total number of training samples. In the following \Cref{sec:softmax} we shall see another loss function that is important for multiclass classification.
+where $N$ is the total number of training samples. In the following \Cref{sec:softmax} we shall see another loss function that is important for multiclass classification.
 
 \section{Softmax} \label{sec:softmax}
-For convenience in the following section, we shall call the network output $f(\symbfit{x}; \symbfit{\theta})$ as $\symbfit{o}$. Assume that we have a loss function such as mean squared error loss (MSE). When working with \textbf{multiclass classification} problems, where \(\symbfit{y} \in \left\{1,\ldots, K \right\}\); we expect the output of the model to be a vector of class probabilities where each value tells us the probability that a sample belongs to a particular class.
+For convenience in the following section, we shall call the output of network $f(\symbfit{x}; \symbfit{\theta})$ as $\symbfit{o}$. Assume that we have a loss function such as mean squared error loss (MSE). When working with \textbf{multiclass classification} problems, where \(\symbfit{y} \in \left\{1,\ldots, K \right\}\); we expect the output of the model to be a vector of class probabilities where each value tells us the probability that a sample belongs to a particular class.
 Note that we generally employ the ``one-hot'' encoding mechanism where $\symbfit{y} = (0, ... , 0, 1, 0, ... , 0)$.
 We can try to directly minimise the difference between $\symbfit{o}$ and $\symbfit{y}$. Although treating classification as a regression problem may work well, it still lacks in two main ways:
 \begin{itemize}
@@ -209,15 +209,14 @@ Note that the highest value in $\symbfit{o}$ corresponds to the most likely clas
 The softmax function gives us a vector $\symbfit{\hat{y}}$, which we can interpret as (estimated) conditional probabilities of each class, given any input $\symbfit{x}$, like $P(y=\text{class} | \symbfit{x})$. 
 The cross-entropy loss measures the difference between two probability distributions; in this case, it measures the difference between $\symbfit{\hat{y}}$ and $\symbfit{y}$. The cross-entropy loss is given as:
 \begin{equation}\label{eqn:ce-loss}
-    \mathcal{L}(\symbfit{y}, \hat{\symbfit{y}}) = - \sum_{j=1}^K y_j \log \hat{y}_j.
+    \mathcal{L}(\symbfit{y}, \hat{\symbfit{y}}) = - \sum_{j=1}^K \symbfit{y}_j \log \hat{\symbfit{y}}_j.
 \end{equation}
 
 Note that the loss defined in \cref{eqn:ce-loss}, has a lower bound of $0$ when $\hat{\symbfit{y}}$ is a probability vector, that is, no single entry is greater than $1$, and hence its negative logarithm cannot be lower than $0$. For multiclass classification problems, the cost function is calculated as follows:
 \begin{equation}
-    J(\symbfit{\theta}) = - \frac{1}{m} \sum_{j=1}^{m} \sum_{i=1}^{c} \symbfit{y_{i}^{(j)}}\log(\symbfit{\hat{y}_{i}^{(j)}})
+    J(\symbfit{\theta}) = - \frac{1}{N} \sum_{j=1}^{N} \sum_{i=1}^{K} \symbfit{y_{i}^{(j)}}\log(\symbfit{\hat{y}_{i}^{(j)}})
 \end{equation}
-
-To better understand the origins of the cross-entropy loss, please refer to \textcite{zhang2021dive}.
+where $\symbfit{y_{i}^{(j)}}$ and $\symbfit{\hat{y}_{i}^{(j)}}$ are the true and predicted output for the $j\textsuperscript{th}$ input sample $\symbfit{x}_j$. To better understand the origins of the cross-entropy loss, please refer to \textcite{zhang2021dive}.
 
 \subsection{Softmax vs Sigmoid}\label{ssec:softmax-vs-sigmoid}
 The softmax and sigmoid functions are similar, as they help squeeze the network output within a certain range. The softmax function operates on a vector input, while the sigmoid takes a scalar value as input. In fact, the sigmoid function is a special case of the softmax function for a classifier with only two input classes (binary classification problem). We can show this if we set the input vector to $\symbfit{z} = [x, 0]$ and calculate the first output element with the usual softmax formula:
@@ -290,7 +289,6 @@ Now we can calculate the gradient \(\sfrac{\partial J}{\partial \symbfit{w}}\), 
     \frac{\partial J}{\partial \symbfit{w}}= \left(\frac{\partial J}{\partial \symbfit{\hat{y}}} \times \frac{\partial \symbfit{\hat{y}}}{\partial \symbfit{w}}\right).
 \end{equation}
 where \(\sfrac{\partial \symbfit{\hat{y}}}{\partial \symbfit{w}} = \symbfit{x}\).
-
 Notice that the order of calculations are now \textbf{reversed} relative to those performed in the forward pass. Here we start with the output emitted by the neural network and work our way backwards towards the parameters. We can repeat the above steps for computing \(\sfrac{\partial J}{\partial b}\). Intuitively, this tells us how to update $\symbfit{w}$ and $b$ in order to reduce $J(\symbfit{\theta})$.
 
 We must also be aware of the fact that we optimise for the loss function $\mathcal{L}$, that is, we are trying to find the optimal set of parameters $\symbfit{\theta}$ that will give us the lowest value of the loss function across $N$ training samples. In other words, we are trying to find the minima of $\mathcal L$ with respect to the input $\symbfit x$ and the parameters $\symbfit{\theta}$.
@@ -307,10 +305,11 @@ where $\nabla_{\theta} J(\symbfit{\theta})$ is the average of the gradients of t
 
 However, this method is intractable for very large values of $N$. Therefore, we choose to compute gradients for a smaller set of $m$ samples such that $m \ll N$:
 \begin{equation}
+\label{eqn:sgd-proper}
     \nabla_{\theta} J(\symbfit{\theta}) = \frac{1}{2m} \sum_{i=1}^{m}\nabla_{\symbfit{\theta}}\mathcal{L}(f(\symbfit{x};\symbfit{\theta}), y).
     % \bigg[\frac{\partial L}{\partial w}, \frac{\partial L}{\partial b}, \ldots \bigg]^\top
 \end{equation}
-The idea of stochastic approximation behind \textbf{stochastic gradient descent} (SGD) is an approximation of the gradient from a small number of input samples \parencite{Bottou2016}. The SGD update step is similar to \Cref{eqn:basic-gd}.
+This is the idea of stochastic approximation behind \textbf{stochastic gradient descent} (SGD). It is an approximation of the gradient from a small number of input samples \parencite{Bottou2016}. The SGD update step in \cref{eqn:sgd-proper} is similar to \Cref{eqn:basic-gd}.
 % \begin{equation}
 % \symbfit{\theta}^{\prime}=\symbfit{\theta}-\eta \frac{1}{2m} \sum_{i=1}^{m} \nabla_{\symbfit{\theta}}J(\symbfit{\theta}).
 % \end{equation}

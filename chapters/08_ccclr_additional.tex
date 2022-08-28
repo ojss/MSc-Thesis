@@ -1,7 +1,7 @@
-\chapter{\ccclr{}: Additional Materials}\label{sec:ccclr-additional-mat}
+\chapter{\ccclr{}: Additional Materials}\label{chap:c3lr-additional-mat}
 
 This chapter deals with the justification of certain design choices made for \ccclr{} (\Cref{chap:c3lr-art}), that could not be covered in the original article due to space constraints.
-The algorithm from the article is made available below for convenience.
+The algorithm in the article is made available here for convenience.
 \begin{algorithm}[ht]
     \caption{\scalebox{.9}{Class-Cognizant Contrastive Learning (\ccclr{})}}\label{alg:pclr-c}
     
@@ -53,7 +53,7 @@ The algorithm from the article is made available below for convenience.
 
 \section{Choice of Clustering Algorithm}\label{sec:c3lr-clustering-algo}
 
-As we can see from \Cref{alg:pclr-c} and \cref{chap:c3lr-art}, the re-ranking step and clustering are crucial to its functioning. The purpose of this section is to show why \texttt{HDBSCAN} \parencite{McInnes2017Hdbscan:Clustering} was chosen in combination with the $k$-reciprocal Jaccardian distance \parencite{ZhongRe-rankingEncoding}. To motivate our choices we shall refer to \cref{tab:c3lr-combos}.
+As we can see from \Cref{alg:pclr-c} and \cref{chap:c3lr-art}, the re-ranking and clustering steps are crucial to its functioning. The purpose of this section is to show why \texttt{HDBSCAN} \parencite{McInnes2017Hdbscan:Clustering} was chosen in combination with the $k$-reciprocal Jaccardian distance \parencite{ZhongRe-rankingEncoding}. To motivate our choices, we shall refer to \cref{tab:c3lr-combos}.
 
 \begin{table}[!ht]
     \centering
@@ -84,30 +84,27 @@ As we can see from \Cref{alg:pclr-c} and \cref{chap:c3lr-art}, the re-ranking st
         \ccclr{}         & HDBSCAN + $k$-rJd & \xmark & - & 200 & 800 & \underline{64.81} \\
         \bottomrule
     \end{tabularx}}
-    \caption{Table comparing design choices for \ccclr{} though accuracy ($\%$) on (\nwks{5}{5}) classification tasks. Style: \textbf{best} and \underline{second best}.}
+    \caption{Table comparing design choices for \ccclr{} though accuracy ($\%$) on (\nwks{5}{5}) classification tasks. $L$ is number of source images, $B$ is the total number of images including augmentations. Style: \textbf{best} and \underline{second best}.}
     \label{tab:c3lr-combos}
 \end{table}
 
-\cref{tab:c3lr-combos} shows the performance of \ccclr{} with $K$-means and \texttt{HDBSCAN} as clustering algorithms of choice. The best performing variant of \ccclr{} is the \textbf{oracle} variant, this variant of the model provided access to the true labels of the data. The true labels allowed the creation of the ideal cluster centres. To understand why this is, we shall elaborate on lines $9$ and $10$ in \cref{alg:pclr-c}. In line $9$, \texttt{HDBSCAN} processes the input data and groups them, when we say that an element belongs to cluster $\symbf{C}_p$ it also implies that $\symbf{C}_p$ functions as a predicted label for that element. 
+\cref{tab:c3lr-combos} shows the performance of \ccclr{} with $K$-means and \texttt{HDBSCAN} as clustering algorithms of choice. The best performing variant of \ccclr{} is the \textbf{oracle} variant, this variant of the model provided access to the true labels of the data. The true labels allowed the creation of the ideal cluster centres. To understand why this is, we shall elaborate on lines $9$ and $10$ in \cref{alg:pclr-c}. In line $9$, \texttt{HDBSCAN} processes the embeddings and groups them, when we say that an element belongs to cluster $\symbf{C}_p$ it also implies that $\symbf{C}_p$ functions as a predicted label for that element. 
 Instead of using predicted labels, the oracle variant uses actual labels. Since we know the actual grouping of elements, we can calculate the ideal cluster centres on line $10$. 
 The purpose of the oracle model is to gauge the potential maximum performance that could be achieved using the training algorithm in question if the model were given all available label information without changing any other aspects of the training algorithm. 
-It gives us a theoretical maximum that we know the training regime is capable of reaching, and ideally we want non-oracle models to be as close as possible to the performance of the oracle variant.
+It gives us a theoretical maximum that we know the training regime is capable of reaching. Ideally we want non-oracle models to be as close as possible to the performance of the oracle variant.
 
-From \cref{tab:c3lr-combos} we see that we have tried to use $K$-means with various values of $K$. We tried values of $K$ that seemed reasonable, however the results were not promising and were the same as that of ProtoCLR. The choice of $K$ was kept to at most $25$, because we wanted a cluster to have sufficient samples for the calculation of the loss $\mathcal{L}_1$.
+As shown in \cref{tab:c3lr-combos}, the $K$-means algorithm has been tested with various values of $K$. We tried values of $K$ that seemed reasonable; however, the results were not promising and were the same as that of ProtoCLR. The choice of $K$ was kept to at most $25$, because we wanted a cluster to have sufficient samples for the calculation of loss $\mathcal{L}_1$.
 Choosing the ideal value for $K$ is also an additional overhead; for example, a value of $K$ that works well with \miniImagenet{} may not work well for \tieredImagenet{}.
-We were unable to test the combination of $K$-means with $k$-reciprocal Jaccardian distance ($k$-rJd) because the implementation of $K$-means in Scikit-learn does not take a distance matrix as input \parencite{scikit-learn}.
+We were unable to test the combination of $K$-means with $k$-reciprocal Jaccardian distance ($k$-rJd) because the implementation of $K$-means in Scikit-learn does not take a custom distance matrix as input \parencite{scikit-learn}.
 
-With the shortcomings of $K$-means in mind, we wanted to use a modern clustering algorithm that could take custom distance matrices and automatically discover the ideal number of clusters in a given batch. We decided to explore \texttt{HDBSCAN} as it can find clusters with variable densities and is also less prone to noise than DBSCAN \parencite{McInnes2017Hdbscan:Clustering}. 
+With the shortcomings of $K$-means in mind, we wanted to use a smarter clustering algorithm that could take custom distance matrices and automatically discover the ideal number of clusters in a given batch of size $B$. We decided to explore \texttt{HDBSCAN} \parencite{McInnes2017Hdbscan:Clustering} as it can find clusters with variable densities and is also less prone to noise than DBSCAN \parencite{ester1996density,schubert2017dbscan}. 
 
 Choosing \texttt{HDBSCAN} did not immediately pay off; however, we did notice that the performance of \ccclr{} was more stable with \texttt{HDBSCAN} since we no longer needed to determine the optimal number of clusters required by trial and error. 
-The stability given to us by HDBSCAN gave us the confidence to investigate other changes in \ccclr{} that could improve performance. A natural thought was to refine the neighbourhood of each sample so that it is close to elements that are similar to itself, since this would allow HDBSCAN to discover better clusters. Therefore, we took inspiration from the method developed by \textcite{Ji2019UnsupervisedTraining} and utilised $k$-reciprocal Jaccardian distance based re-ranking of elements \parencite{ZhongRe-rankingEncoding}. $k$-rJd takes into account the reciprocal relationship between
-data points and is therefore a stricter rule to measure whether two feature points match or not, thereby aiding \texttt{HDBSCAN} in finding better clusters.
+The stability given to us by \texttt{HDBSCAN} gave us the confidence to investigate other changes in \ccclr{} that could improve performance. A natural thought was to refine the neighbourhood of each sample so that it is close to elements that are similar to itself, since this would allow \texttt{HDBSCAN} to discover better clusters. Therefore, we took inspiration from the method developed by \textcite{Ji2019UnsupervisedTraining} and utilised $k$-reciprocal Jaccardian distance ($k$-rJd) based re-ranking of elements \parencite{ZhongRe-rankingEncoding}. $k$-rJd takes into account the reciprocal relationship between data points and is therefore a stricter rule to measure whether two feature vectors match or not, thereby aiding \texttt{HDBSCAN} in finding better clusters.
 
 It is well known that both $K$-means and \texttt{HDBSCAN} suffer from the curse of dimensionality \parencite{Kriegel09, McInnes2017Hdbscan:Clustering}; to mitigate the effects of dimensionality, we explored the use of UMAP \parencite{mcinnes2018umap} prior to the re-ranking and clustering steps on the lines $8-9$.
 The idea was to apply UMAP to $f_\phi(\symbfit{x}) \in \mathbb{R}^{1600}$ and reduce the dimensionality to $\mathbb{R}^3$ or $\mathbb{R}^2$.
-Unfortunately, we did not see significant performance improvements. The results of this are also given in \cref{tab:c3lr-combos}.
-
-
+Unfortunately, we did not see significant performance improvements. The results of this are also given in \cref{tab:c3lr-combos}. The column \textquote{UMAP $\mathbb{R}^{\symbf \cdot}$} refers to the number of UMAP dimensions.
 
 \section{Shortcomings of \ccclr{}}\label{sec:c3lr-shortcomes}
 
@@ -115,7 +112,20 @@ Although \ccclr{} is better than its competitors, it still has some shortcomings
 
 \subsection{Unstable Clusters}\label{ssec:unstable-clusters}
 
-As discussed in \cref{sec:c3lr-clustering-algo}, we decided to use \texttt{HDBSCAN} as it provided a \textit{relatively} more stable performance than $K$-means. However, \texttt{HDBSCAN} frequently generated massive clusters, as there is no way to constrain how many elements can be placed in a cluster. This meant that members of certain clusters were not really similar. Moreover, running the HDBSCAN algorithm for every batch is a time consuming and computationally heavy process.
+As discussed in \cref{sec:c3lr-clustering-algo}, we decided to use \texttt{HDBSCAN} as it provided a \textit{relatively} more stable performance than $K$-means. However, \texttt{HDBSCAN} frequently generated massive clusters, as there is no way to constrain how many elements can be placed in a cluster. This meant that members of certain clusters were not really similar, leading to a sub-optimal effect of loss $\mathcal{L}_1$ on the learning process. From \cref{fig:c3lr-hdbscan-results,fig:hdbscan-noise-count} we can see that the sheer number of points classified as noise hovers around the $400$ mark. It must be noted that \ccclr{} has an effective batch size $B=800$, which means that in every training iteration roughly half of the data was discarded as noise by \texttt{HDBSCAN}. Only the remaining amount of data played an active role in the calculation of $\mathcal{L}_1$.
+Moreover, running the \texttt{HDBSCAN} algorithm for every batch is a time-consuming and computationally heavy process.
+\begin{figure}[ht]
+    \centering
+    \includegraphics[scale=0.15]{chapters/assets/c3lr_extra/noise_counts.pdf}
+    \caption{This graph shows the amount of points clustered as noise by \texttt{HDBSCAN}. We can see that roughly $400$ points are always classified as noise, even after $20,000$ training iterations.}
+    \label{fig:hdbscan-noise-count}
+\end{figure}
+
+\newpage
+\subsection{Partial Compatibility with Gradient Based Learning}\label{ssec:c3lr-grad-based}
+
+A major drawback of \ccclr{} is that the re-ranking and clustering steps are not compatible with gradient based learning. This means that any operations performed by these steps are not recorded in the computational graph tracked by PyTorch \parencite{pytorch2019}. A computational graph keeps track of all mathematical operations performed on a variable; during backpropagation this computational graph is used to calculate the gradients.
+Due to this, information that is valuable to the model is lost between lines $8$ and $9$. The loss $\mathcal{L}_1$ is partially able to address this issue, however, it is far from ideal.
 
 \begin{figure}[th]
      \centering
@@ -129,11 +139,5 @@ As discussed in \cref{sec:c3lr-clustering-algo}, we decided to use \texttt{HDBSC
          \includegraphics[width=\textwidth]{chapters/assets/c3lr_extra/c2.png}
      \end{subfigure}
      \label{fig:c3lr-hdbscan-results}
-     \caption{Two plots showing the clusters generated by UMAP \parencite{mcinnes2018umap}. Notice the massive \textcolor{yellow}{yellow} and \textcolor{blue}{blue} clusters, it is unlikely all elements in them are truly similar. Unfortunately, due to the variable number of clusters generated by \texttt{HDBSCAN}, the legend is shown as a continuous colour scale to avoid repetition of colours. Cluster \textquote{$-1$} contains noisy points.}
+     \caption{Two UMAP plots showing the clusters generated by \texttt{HDBSCAN} \parencite{McInnes2017Hdbscan:Clustering}. Notice the massive \textcolor{yellow}{yellow} (left) and \textcolor{blue}{blue} (right) clusters, it is unlikely all elements in them are truly similar. Unfortunately, due to the variable number of clusters generated by \texttt{HDBSCAN}, the legend is shown as a continuous colour scale to avoid repetition of colours. Cluster \textquote{$-1$} contains noisy points.}
 \end{figure}
-
-
-\subsection{Partial Compatibility with Gradient Based Learning}\label{ssec:c3lr-grad-based}
-
-A major drawback of \ccclr{} is that the re-ranking and clustering steps are not compatible with gradient based learning. This means that any operations performed by these steps are not recorded in the computational graph tracked by PyTorch \parencite{pytorch2019}. A computational graph keeps track of all mathematical operations performed on a variable; during backpropagation this computational graph is used to calculate the gradients.
-Due to this, information that is valuable to the model is lost between lines $8$ and $9$. The loss $\mathcal{L}_1$ is partially able to address this issue, however, it is far from ideal.

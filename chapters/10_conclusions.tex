@@ -1,0 +1,27 @@
+\chapter{Conclusions}\label{chap:future-work}
+
+% In this chapter, we summarise the main findings of the thesis. In \cref{label:discussion} we discuss the main contributions of both \samptr{} and \ccclr{}. Based on the limitations of both methods, we propose future research directions in \cref{sec:future-work}.
+
+\section{Future Work}\label{sec:future-work}
+
+Based on the limitations of our approaches discussed in \cref{chap:c3lr-additional-mat} and \cref{chap:samptr-additional-mat}, we have some future directions for future research.
+One of the simplest directions to explore would be to swap the \samp{} layer in favour of Graph Attention V2 \parencite{brody2021attentive} or Non-Parametric Transformers \parencite{kossen2021self}. Both of these methods claim to be more powerful than the variety of attention we use in \samp{}, and it would be interesting to see if these methods can learn to refine embeddings better than \samp{}.
+
+We also think that a memory module would be beneficial for \samptr{}, so that it can better learn the data space manifold. Similar to NNCLR \parencite{dwibedi2021little} or MoCo \parencite{He2015}, \samptr{} could access examples that were seen in previous batches and use them to learn better semantic features. 
+Another related possibility is to use a memory bank to learn prototypes based on the dataset. With each batch that is seen by the network, this memory bank can be updated with more representative prototypes. The prototypes can then be used in downstream tasks and even be fine-tuned if required.
+Furthermore, we could build a graph based memory system that can summarise and keep track of relations between seen entities. The summarisation process could involve storing prototypes as a graph, along with a few ($<5$) examples each. These relations can be exploited during the training or testing process to find the optimal representation or class, respectively.
+
+It is also worth exploring different kinds of pre-text tasks for self-supervision. One particularly interesting pre-text task would be a form of masked image modelling \parencite{xie2022simmim, he2022masked} with the aid of graphs. The high-level idea is to make patches from each of the input images in the batch and have the network reconstruct it. We continue using the \samp{} layer so that the network learns to reconstruct images using information available in other images. The hope is that the network would be forced to look beyond single instances and \textquote{borrow} information available from other images in the batch.
+
+
+\section{Conclusion}\label{label:discussion}
+Inspired by the human mind's propensity to quickly learn rich representations and relationships
+between known and unknown elements, this body of work introduces two novel ideas for self-supervised few-shot learning, namely \samptr{} and \ccclr{}. 
+
+\ccclr{} looks beyond single instances by incorporating class cognisance through: (i) an unsupervised iterative re-ranking and clustering step, followed by (ii) an adjusted optimisation loss formulation. We demonstrate that our proposed approach (\ccclr{}) offers considerable performance improvement over its predecessor ProtoTransfer in both in-domain benchmarks like \miniImagenet{} and Omniglot. \ccclr{} also showcases competitive performance on the more challenging cross-domain few-shot learning (CDFSL) benchmark.
+
+In \samptr{}, the proposed method utilises a variant of the graph attention network that we call \samp{} in a contrastive learning scheme. The \samp{} layer helps the model look beyond a single instance, find other similar items in an entire batch and jointly refine their embeddings. \samp{} allows the model to extract richer semantic information across multiple images present in a mini-batch. Unlike \ccclr{}, \samptr{} no longer requires the re-ranking and clustering steps, making it more computationally efficient.
+Furthermore, \samptr{} also proposes the use of \opttune{}, an optimal transport based task adaptation framework that helps align support and query embeddings during test time without requiring any trainable parameters. With \opttune{}, we prove that fine-tuning does not have to be unremarkable, instead it can play an active role in elevating the robustness of a pre-trained network.
+
+Through \samptr{} and \ccclr{}, we have successfully shown that unsupervised few-shot learning can match the performance of some of the latest supervised methods. By having these approaches look beyond single instances, we mimicked a form of the human learning process and applied it to the unsupervised few-shot learning problem.
+With both of these methods, we firmly believe to have taken a step forward in the long and arduous journey to close the gap between human and machine.

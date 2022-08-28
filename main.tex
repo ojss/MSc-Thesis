@@ -1,6 +1,9 @@
 \documentclass[whitelogo]{TUD-report2020}
-\usepackage{changes}
-\definechangesauthor[name=Ojas, color=tudelft-orange]{ojas}
+% \usepackage{changes}
+% \definechangesauthor[name=Ojas, color=tudelft-orange]{ojas}
+\usepackage[english]{babel}
+%% Each \babelprovide can only be used for one language
+
 \usepackage{csquotes}
 \usepackage{epsfig}
 \usepackage{graphicx}
@@ -102,6 +105,8 @@ citecolor=tudelft-lavendel}
 \newcommand{\tieredImagenet}{\textit{tiered}ImageNet}
 \newcommand{\ccclr}{\texttt{C$^3$LR}}
 \def\samptr{\texttt{SAMPTransfer}}
+\newcommand{\opttune}{\texttt{OpT-Tune}}
+\newcommand{\samp}{\texttt{SAMP}}
 % \DeclareMathAlphabet{\mathsfit}{\encodingdefault}{\sfdefault}{m}{sl}
 % \SetMathAlphabet{\mathsfit}{bold}{\encodingdefault}{\sfdefault}{bx}{n}
 
@@ -153,7 +158,7 @@ citecolor=tudelft-lavendel}
 
 %% Uncomment following 16 lines for a cover with a picture on the lower half only
 \title[tudelft-white]{Self-Supervised Few Shot Learning}
-\subtitle[tudelft-white]{Prototypical Contrastive Learning with Graphs by Looking Beyond Single Instances}
+\subtitle[tudelft-white]{Prototypical Contrastive Learning with Graphs} %by Looking Beyond Single Instances}
 \author[tudelft-white]{Ojas Kishorkumar Shirekar}
 \affiliation{Technische Universiteit Delft}
 \coverimage{neural.jpg}
@@ -185,16 +190,16 @@ citecolor=tudelft-lavendel}
 
 \input{chapters/notation}
 
-\listofchanges[title=Comments]
+% \listofchanges[title=Comments]
 
 \input{chapters/01_intro}
 
-\chapter{Scientific Article 1 (\samptr)}\label{chap:samp-transfer-art}
-\includepdf[pages=-, pagecommand={}]{chapters/articles/samp/sampt.pdf}
 
-\chapter{Scientific Article 2 (\ccclr)}\label{chap:c3lr-art}
+\chapter{Scientific Article 1 (\ccclr)}\label{chap:c3lr-art}
 \includepdf[pages=-, pagecommand={}]{chapters/articles/c3lr/ICIP_C3LR_final.pdf}
 
+\chapter{Scientific Article 2 (\samptr)}\label{chap:samp-transfer-art}
+\includepdf[pages=-, pagecommand={}]{chapters/articles/samp/WACV_SAMPTransfer.pdf}
 % \input{chapter-1}
 
 % \input{chapters/02_basics_of_dl}
@@ -214,7 +219,7 @@ citecolor=tudelft-lavendel}
 
 \input{chapters/09_sampt_additional}
 
-\input{chapters/10_conclustions}
+\input{chapters/10_conclusions}
 
 %% Use letters for the chapter numbers of the appendices.
 \appendix

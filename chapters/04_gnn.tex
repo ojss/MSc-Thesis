@@ -41,7 +41,7 @@ Currently, there are a few ways to incorporate permutation invariance. The first
     \label{eqn:perm-invar-avg}
     \widehat{f}(\symbf{X}) = \frac{1}{|{T}_n|} \sum_{\pi \in {T}_n} \phi \bigl( \pi \left( \symbf{X} \right) \bigr)
 \end{equation}
-where $\symbfit{X}=\left(\symbfit{x}_1, \ldots, \symbfit{x}_n\right)^\top$ is a stack of node features and has $n$ elements with $d$ dimensionality, $T_n$ is the set of all permutations of $n$ elements, and $\phi$ is a permutation-sensitive model. Therefore, we construct a permutation-invariant $\widehat{f}$ from a permutation-sensitive $\phi$.
+where $\symbfit{X}=\left[\symbfit{x}_1^\top, \ldots, \symbfit{x}_n^\top\right]^\top$ is a stack of node features and has $n$ elements with $d$ dimensionality, $T_n$ is the set of all permutations of $n$ elements, and $\phi$ is a permutation-sensitive model. Therefore, we construct a permutation-invariant $\widehat{f}$ from a permutation-sensitive $\phi$.
 
 This idea is called \textbf{Janossy pooling} and was first introduced by \textcite{Murphy2018}. Indeed, it is a straightforward and easy way to achieve permutation invariance, but it happens to be very computationally intensive. The computational cost is dominated by the sum over $T_n$ in \cref{eqn:perm-invar-avg}, where the number of elements in $T_n$ is $n!$. As one can imagine, if $\symbfit{X}$ is a mini-batch with very large $n$, \cref{eqn:perm-invar-avg} quickly becomes intractable.
 
@@ -131,7 +131,7 @@ and a node-wise function $\rho$ is permutation equivariant if
 \subsection{Modelling Relations and Interactions}\label{ssec:relation-and-interactions}
 
 \samptr{} has yet another fundamental idea that is essential for its success and operation. 
-It is able to exploit the interactions (or relations) between elements in a set (mini-batch), which really means that we are trying to capture the fact that our model output may depend not only on the individual contribution of each element, but it may be crucial to also take into account the fact that certain elements appear together in the same set. Our goal is simply to model and use these interactions.
+It is able to exploit the interactions (or relations) between elements in a mini-batch, which really means that we are trying to capture the fact that our model output may depend not only on the individual contribution of each element, but it may be crucial to also take into account the fact that certain elements appear together in the same set. Our goal is simply to model and use these interactions.
 
 To illustrate this with a simple example, imagine the task of evaluating how well a set of ingredients work together to cook a meal. Setting $k=1$ allows the function $\phi$ to consider related individual attributes, but cannot detect conflicts between ingredients (e.g., garlic vs. caramel). A larger $k$ allows $\phi$ to see more than one item at a time, allowing it to make relational inferences about pairs of ingredients, allowing for a more expressive model of deliciousness. Considering $\phi$ as an encoder and $\rho$ as a decoder, $\phi$ can encode information about interactions, which $\rho$ can use for decoding.
 
@@ -185,9 +185,9 @@ The softmax function can be sensitive to very large input values. These kill the
 \begin{equation}
 \label{eqn:qkv-attn-weight-calc}
 \begin{split}
-    a^\prime(i, j) &= \frac{\symbfit{q}_i^\top \symbfit{k}_j}{\sqrt{d}}\\
+    a^\prime_{i, j} &= \frac{\symbfit{q}_i^\top \symbfit{k}_j}{\sqrt{d}}\\
     % a_{i j}& =\frac{\exp a_{i j}^{\prime}}{\sum_{j} \exp a_{i j}^{\prime}}
-    a(i, j) &= \operatorname{softmax}\left( a^\prime(i, j) \right)\\
+    a_{i, j} &= \operatorname{softmax}\left( a^\prime_{i, j} \right)\\
 \end{split}
 \end{equation}
 
@@ -195,14 +195,15 @@ The softmax function can be sensitive to very large input values. These kill the
 Consider a vector in $\mathbb{R}^d$ with all values $c$. Its Euclidean length is $\sqrt{d}c$. Therefore, we are dividing out the amount by which the increase in dimension increases the length of the average vectors.
 \end{tcolorbox}
 
-We then use the attention weights calculated in \Cref{eqn:qkv-attn-weight-calc}, to compute a weight sum to generate the output vector. Note that the output vector $\symbfit{z}_i$ depends on $\symbf{v}_j \forall j$ however not every $\symbfit{v}_j$ contributes equally to output $\symbfit{z}_i$. The contribution to the output is controlled by the attention weight $a(i, j)$.
+We then use the attention weights calculated in \Cref{eqn:qkv-attn-weight-calc}, to compute a weight sum to generate the output vector. Note that the output vector $\symbfit{z}_i$ depends on $\symbfit{v}_j, \forall j$ however not every $\symbfit{v}_j$ contributes equally to output $\symbfit{z}_i$. The contribution to the output is controlled by the attention weight $a_{i, j}$:
 \begin{equation}
     \label{eqn:qkv-attn-aggregation}
-    \symbfit{z}_{i}=\sum_{j} a(i, j) \symbfit{v}_{j}
+    \symbfit{z}_{i}=\sum_{j} a_{i, j} \symbfit{v}_{j}.
 \end{equation}
 
-As stated in \Cref{sec:janossy-pooling,sec:graph-nn}, self-attention is a special case of graph neural networks. We can see this from \Cref{eqn:qkv-attn-aggregation,eqn:attn-gnn,eqn:janossy-attention}. We can also view this from the message-passing perspective presented in \Cref{sec:graph-nn} to realise that every output is determined by all its neighbours; it is this structure that $\samptr$ successfully makes use of in order to \textquote{look} beyond single instances and refine features.
+As stated in \Cref{sec:janossy-pooling,sec:graph-nn}, self-attention is a special case of graph neural networks and was first proposed by \textcite{vaswani2017attention}. We can see this from \Cref{eqn:qkv-attn-aggregation,eqn:janossy-attention}. We can also view this from the message-passing perspective presented in \Cref{sec:graph-nn} to realise that every output is determined by all its neighbours; it is this structure that $\samptr$ successfully makes use of in order to \textquote{look} beyond single instances and refine features.
 
+\newpage
 \section{Graph Neural Networks}\label{sec:graph-nn}
 
 Now that we have described graphs and permutation invariant and equivariant functions, we can begin to talk about Graph Neural Networks (GNNs). GNNs are perhaps among the most \textbf{general} class of deep learning architectures in existence at this moment. Some deep learning architectures can be understood as special cases of the GNN with additional geometric structure. As it happens, we have already covered one such specific case, self-attention in \cref{sec:jan-attn}.
